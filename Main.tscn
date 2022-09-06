@@ -55,16 +55,20 @@ custom_fonts/font = SubResource( 2 )
 text = "Verify"
 
 [node name="ProgressBar" type="ProgressBar" parent="."]
+visible = false
 margin_left = 384.0
 margin_top = 416.0
 margin_right = 960.0
 margin_bottom = 448.0
 percent_visible = false
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+[node name="Music" type="AudioStreamPlayer" parent="."]
 
 [node name="Popup1" parent="." instance=ExtResource( 4 )]
 visible = false
 
-[connection signal="pressed" from="Update" to="Icon" method="_on_Update_pressed"]
+[node name="SFX" type="AudioStreamPlayer" parent="."]
+
+[connection signal="file_done" from="." to="." method="_on_Control_file_done"]
+[connection signal="pressed" from="Update" to="." method="_on_Update_pressed"]
 [connection signal="pressed" from="Verify" to="." method="_on_Verify_pressed"]
