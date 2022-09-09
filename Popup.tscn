@@ -1,24 +1,44 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=2 format=2]
 
-[sub_resource type="DynamicFontData" id=1]
-font_path = "res://assets/Staatliches-Regular.ttf"
+[sub_resource type="GDScript" id=1]
+script/source = "extends ConfirmationDialog
 
-[sub_resource type="DynamicFont" id=2]
-size = 380
-font_data = SubResource( 1 )
+var val
+signal pressed
+func _ready():
+	get_cancel().connect(\"pressed\", self, \"cancel\")
+	get_ok().connect(\"pressed\",self,\"ok\")
 
-[node name="Popup1" type="AcceptDialog"]
+func get_val(text):
+	dialog_text = text
+	popup()
+	yield(self,\"pressed\")
+	return val # 0 = retry, 1=ok
+
+
+func cancel():
+	val = 0
+	emit_signal(\"pressed\")
+	
+func ok():
+	val = 1
+	emit_signal(\"pressed\")
+"
+
+[node name="Popup1" type="ConfirmationDialog"]
 visible = true
+anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_top = 17.0
-margin_right = -112.0
-margin_bottom = -64.0
+margin_top = -600.0
+window_title = "OOOH THIS IS BAD!"
+resizable = true
+script = SubResource( 1 )
 
 [node name="Label2" type="Label" parent="."]
-margin_left = 48.0
-margin_top = 15.0
-margin_right = 944.0
-margin_bottom = 490.0
-custom_fonts/font = SubResource( 2 )
-text = "TOAST	"
+visible = false
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 1016.0
+margin_bottom = 564.0
+text = "placeholder text"
