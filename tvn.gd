@@ -54,6 +54,7 @@ func get_installed_revision(dir):
 func dl_file_to_mem(url,bin=false):
 	var data = GDDL.new()
 	data.set_agent(ua)
+	print(url)
 	if bin == false:
 		var ret = data.download_to_string(url)
 		if ret:

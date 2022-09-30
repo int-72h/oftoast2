@@ -22,7 +22,41 @@ signal file_done(path)
 signal verif_fail(path)
 signal thread_done(thread_no)
 
+func get_of_path():
+	var has_of = false
+	var current_revision
+	var steam_dir
+	var of_dir
+	if OS.get_name() == "X11":
+		print("this is linux!")
+		var dir = Directory.new()
+		var home_dir = OS.get_data_dir().split("/.local")[0]
+		print(home_dir)
+		steam_dir = home_dir + "/.steam/steam/"
+		of_dir = steam_dir + "steamapps/sourcemods/open_fortress"
+		if dir.dir_exists(of_dir):
+			print("ja you has the oopen fortress")
+			has_of = true
+		elif dir.dir_exists(steam_dir):
+			print("no of? dam")
+			dir.make_dir_recursive(of_dir)
+		else:
+			print("no steam??? wtf")
+			return
+	elif OS.get_name() == "Windows":
+		print("this is windows!")
+		var reg = OS.execute("reg",["query", "HKLM\\SOFTWARE\\Wow6432Node\\Valve\\Steam", "/v", "InstallPath"])
+	if has_of:
+		var file = File.new()
+		if file.file_exists(of_dir + "/.revision"):
+			file.open(of_dir + "/.revision",file.READ)
+			var rev = file.get_line()
+			if rev.is_valid_integer():
+				current_revision = int(rev)
+				print(current_revision)
+
 func _ready():
+	get_of_path()
 	tvn.ua = ua
 
 func _on_Verify_pressed():
@@ -51,7 +85,7 @@ func start(verify=false):
 	$Update.disabled = true
 	$Verify.disabled = true
 	$ProgressBar.show()
-	var url = "https://toast3.openfortress.fun"
+	var url = "https://toast-eu.openfortress.fun"
 	var path = "[path goes here]"
 	if not("/toast/" in url):
 		if url[-1] != '/':
@@ -119,15 +153,18 @@ func _work(arr):
 	var arr_of_files = arr[0]
 	var thread_no = arr[1]
 	for dl in arr_of_files:
-		var dl_object = GDDL.new()
-		var path = dl[1]
-		var url = dl[0]
-		if not dl_object.download_file(url,path):
-			print("uh oh.")
-			print_debug(dl_object.get_error()) # we really need to handle these properly.
-			emit_signal("verif_fail")
-		else:
-			emit_signal("file_done",path)
+		var file_downloaded = false
+		while file_downloaded == false:
+			var dl_object = GDDL.new()
+			var path = dl[1]
+			var url = dl[0]
+			if not dl_object.download_file(url,path):
+				print("uh oh.")
+				print_debug(dl_object.get_error()) # we really need to handle these properly.
+				emit_signal("verif_fail")
+			else:
+				emit_signal("file_done",path)
+				file_downloaded = true
 	print("whole thread done!")
 	done_threads_arr.append(thread_no)
 
