@@ -45,7 +45,23 @@ func get_of_path():
 			return
 	elif OS.get_name() == "Windows":
 		print("this is windows!")
-		var reg = OS.execute("reg",["query", "HKLM\\SOFTWARE\\Wow6432Node\\Valve\\Steam", "/v", "InstallPath"])
+		var cmd_str = "@echo off\nfor /f \"tokens=2*\" %%a in ('reg query \"HKLM\\SOFTWARE\\WOW6432Node\\Valve\\Steam\" /v InstallPath') do @echo %%b"
+		var temp = File.new()
+		var tomp = Directory.new()
+		tomp.remove("user://tmp.bat")
+		temp.open("user://tmp.bat",File.WRITE)
+		var bat_path = ProjectSettings.globalize_path("user://tmp.bat")
+		temp.store_string(cmd_str)
+		temp.close()
+		var reg = []
+		OS.execute("cmd.exe",["/C",bat_path],true,reg)
+		if "ERROR" in reg[0]:
+			print("no steam??? wtf")
+			return
+		else:
+			steam_dir = reg[0]
+			of_dir = steam_dir + "\\steamapps\\sourcemods\\open_fortress" 
+		
 	if has_of:
 		var file = File.new()
 		if file.file_exists(of_dir + "/.revision"):
