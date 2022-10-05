@@ -45,5 +45,5 @@ func get_of_path():
 			print("no steam??? wtf")
 			return
 		else:
-			steam_dir = reg[0]
+			steam_dir = reg[0].split("\n")[0].strip_edges()
 			of_dir = steam_dir + "\\steamapps\\sourcemods\\open_fortress"

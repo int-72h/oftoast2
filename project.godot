@@ -28,6 +28,7 @@ config/icon="res://icon.png"
 
 default=false
 "default clear"=false
+proxy=false
 
 [gui]
 

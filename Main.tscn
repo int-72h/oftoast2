@@ -1,11 +1,10 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://assets/toast.png" type="Texture" id=1]
 [ext_resource path="res://assets/Staatliches-Regular.ttf" type="DynamicFontData" id=2]
 [ext_resource path="res://Main.gd" type="Script" id=3]
 [ext_resource path="res://Popup.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Icon.gd" type="Script" id=5]
-[ext_resource path="res://Label3.gd" type="Script" id=6]
 [ext_resource path="res://tvn.gd" type="Script" id=7]
 [ext_resource path="res://steam.gd" type="Script" id=8]
 
@@ -45,75 +44,89 @@ expand = true
 script = ExtResource( 5 )
 
 [node name="Label" type="Label" parent="."]
-margin_left = 520.0
-margin_top = 128.0
-margin_right = 1000.0
-margin_bottom = 253.0
+margin_left = 504.0
+margin_top = 144.0
+margin_right = 984.0
+margin_bottom = 269.0
 custom_fonts/font = SubResource( 3 )
-text = "OFTOAST 2"
+text = "OFTOAST II"
 
 [node name="Label4" type="Label" parent="."]
-margin_left = 448.0
-margin_top = 464.0
-margin_right = 928.0
-margin_bottom = 717.0
+margin_left = 496.0
+margin_top = 424.0
+margin_right = 764.0
+margin_bottom = 532.0
 custom_fonts/font = SubResource( 3 )
-text = "DL FAILS"
+text = "DL FAILS:"
 
 [node name="Label5" type="Label" parent="."]
-margin_left = 440.0
-margin_top = 320.0
-margin_right = 920.0
-margin_bottom = 573.0
+margin_left = 496.0
+margin_top = 336.0
+margin_right = 781.0
+margin_bottom = 444.0
 custom_fonts/font = SubResource( 3 )
-text = "THREADS"
+text = "THREADS:"
+
+[node name="Label6" type="Label" parent="."]
+margin_left = 496.0
+margin_top = 264.0
+margin_right = 781.0
+margin_bottom = 372.0
+custom_fonts/font = SubResource( 3 )
+text = "yes:"
 
 [node name="Label2" type="Label" parent="."]
-margin_left = 816.0
-margin_top = 456.0
-margin_right = 886.0
-margin_bottom = 581.0
+margin_left = 792.0
+margin_top = 424.0
+margin_right = 862.0
+margin_bottom = 549.0
 custom_fonts/font = SubResource( 3 )
 text = "0"
 
 [node name="Label3" type="Label" parent="."]
-margin_left = 816.0
-margin_top = 328.0
-margin_right = 886.0
-margin_bottom = 453.0
+margin_left = 792.0
+margin_top = 336.0
+margin_right = 862.0
+margin_bottom = 461.0
 custom_fonts/font = SubResource( 3 )
 text = "0"
-script = ExtResource( 6 )
+
+[node name="Label7" type="Label" parent="."]
+margin_left = 792.0
+margin_top = 264.0
+margin_right = 862.0
+margin_bottom = 389.0
+custom_fonts/font = SubResource( 3 )
+text = "0"
 
 [node name="Update" type="Button" parent="."]
-margin_left = 112.0
+margin_left = 56.0
 margin_top = 416.0
-margin_right = 320.0
+margin_right = 264.0
 margin_bottom = 480.0
 custom_fonts/font = SubResource( 2 )
 text = "Update"
 
 [node name="Verify" type="Button" parent="."]
-margin_left = 112.0
-margin_top = 512.0
-margin_right = 320.0
-margin_bottom = 576.0
+margin_left = 56.0
+margin_top = 520.0
+margin_right = 264.0
+margin_bottom = 584.0
 custom_fonts/font = SubResource( 2 )
 text = "Verify"
 
 [node name="Verify2" type="Button" parent="."]
-margin_left = 520.0
-margin_top = 16.0
-margin_right = 728.0
-margin_bottom = 80.0
+margin_left = 816.0
+margin_right = 1024.0
+margin_bottom = 64.0
 custom_fonts/font = SubResource( 2 )
 text = "force done"
 
 [node name="ProgressBar" type="ProgressBar" parent="."]
 margin_left = 384.0
-margin_top = 416.0
+margin_top = 544.0
 margin_right = 960.0
-margin_bottom = 448.0
+margin_bottom = 576.0
 percent_visible = false
 
 [node name="Music" type="AudioStreamPlayer" parent="."]

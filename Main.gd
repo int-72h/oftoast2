@@ -16,14 +16,18 @@ var done_threads = 0
 var done_threads_arr = []
 var failed_files = []
 var threads = 8
-var delim = "/"
-const ua = "toast_ua/" + version
+var delim = ""
+const ua = "murse/0.3.0" # temporary
 signal all_done
 signal file_done(path)
 signal verif_fail(path)
 signal thread_done(thread_no)
 
 func _ready():
+	if OS.get_name() == "X11":
+		delim = "/"
+	else:
+		delim = "\\"
 	steam.get_of_path()
 	tvn.ua = ua
 
@@ -35,6 +39,7 @@ func _on_Update_pressed():
 
 func _on_Control_file_done(path):
 	$ProgressBar.value += 1
+	$Label7.text =  str(int($Label7.text) + 1)
 
 func _on_Control_thread_done(thread_no):
 	$Label3.text = str(int($Label3.text) + 1)
@@ -78,18 +83,18 @@ func start(verify=false):
 	var writes = filter(tvn.TYPE_WRITE,changes)
 	var dl_array = []
 	for x in writes:
-		dl_array.append([url + "objects/" + x["object"], path + "/" + x["path"]])
+		dl_array.append([url + "objects/" + x["object"], path + delim + x["path"],x["hash"]])
 	for x in filter(tvn.TYPE_DELETE,changes):
 		var error
 		var dir = Directory.new()
-		if dir.file_exists(path + "/" + x["path"]):
-			error = dir.remove(path + "/" + x["path"])
+		if dir.file_exists(path + delim + x["path"]):
+			error = dir.remove(path + delim + x["path"])
 			if error != OK:
 				print_debug(error)
 	for x in filter(tvn.TYPE_MKDIR,changes):
 		var error
 		var dir = Directory.new()
-		error = dir.make_dir_recursive(path +"/" + x["path"])
+		error = dir.make_dir_recursive(path +delim+ x["path"])
 		if error != OK and (error != 20):
 			print_debug(error)
 	var error
@@ -112,9 +117,10 @@ func start(verify=false):
 	file.close()
 	$Icon.stop_tween()
 	$SFX.stream = done
-	$SFX.volume_db = 20
 	$SFX.play()
 	$Music.stop()
+	$Update.disabled = false
+	$Verify.disabled = false
 	
 
 func _work(arr):
@@ -124,6 +130,7 @@ func _work(arr):
 		var file_downloaded = false
 		while file_downloaded == false:
 			var dl_object = GDDL.new()
+			dl_object.set_agent(ua)
 			var path = dl[1]
 			var url = dl[0]
 			if not dl_object.download_file(url,path):
@@ -178,14 +185,22 @@ func work(arr):
 			arr_of_threads[x].start(self,"_work",[[arr[x]],x])
 	print_debug("threads started")
 	
-
 func verify(dl_array):
+	var t = Thread.new()
+	t.start(self,"_verify",dl_array)
+
+
+func _verify(dl_array):
 	var redl_array = []
 	var file = File.new()
 	for dl in dl_array:
-		if dl["hash"] != file.get_sha256(file["path"]):
-			emit_signal("verif_fail",dl["path"])
+		var f = file.open(dl[1],File.READ)
+		if dl[2] != file.get_md5(dl[1]):
+			print("MISMATCH:" + file.get_md5(dl[1]) + " " + dl[2])
+			emit_signal("verif_fail",dl[1])
 			redl_array.append(dl)
+		else:
+			emit_signal("file_done",dl[1])
 	if redl_array == []:
 		emit_signal("all_done")
 	else:
@@ -201,5 +216,3 @@ func _process(delta):
 		done_threads_arr = []
 	if done_threads == threads:
 		emit_signal("all_done")
-
-

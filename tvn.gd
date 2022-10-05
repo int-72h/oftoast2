@@ -62,17 +62,10 @@ func dl_file_to_mem(url,bin=false):
 		else:
 			error_handler(data.get_error())
 	else:
-		var z = data.download_file(url,"/tmp/oggs")
+		var z = data.download_to_array(url)
 		if not z:
 			error_handler(data.get_error())
-		var file = File.new() 
-		var error = file.open("/tmp/oggs", File.READ)
-		var content
-		if error != OK:
-			return -1
-		else:
-			content =  file.get_buffer(file.get_len())
-		return content
+		return z
 	
 func error_handler(error):
 	var dunn = preload("res://assets/this-is-bad.wav")
