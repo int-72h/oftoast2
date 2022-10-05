@@ -2,6 +2,7 @@ extends Control
 
 const GDDL = preload("res://gdnative/gddl.gdns")
 onready var tvn = get_node("/root/Control/tvn")
+onready var steam = get_node("steam")
 var music = preload("res://assets/toast.wav")
 var start = preload("res://assets/start.wav")
 var done = preload("res://assets/done.wav")
@@ -21,59 +22,9 @@ signal all_done
 signal file_done(path)
 signal verif_fail(path)
 signal thread_done(thread_no)
-var has_of = false
-var current_revision
-var steam_dir
-var of_dir
-
-
-func get_of_path():
-	if OS.get_name() == "X11":
-		print("this is linux!")
-		var dir = Directory.new()
-		var home_dir = OS.get_data_dir().split("/.local")[0]
-		print(home_dir)
-		steam_dir = home_dir + "/.steam/steam/"
-		of_dir = steam_dir + "steamapps/sourcemods/open_fortress"
-		if dir.dir_exists(of_dir):
-			print("ja you has the oopen fortress")
-			has_of = true
-		elif dir.dir_exists(steam_dir):
-			print("no of? dam")
-			dir.make_dir_recursive(of_dir)
-		else:
-			print("no steam??? wtf")
-			return
-	elif OS.get_name() == "Windows":
-		print("this is windows!")
-		var cmd_str = "@echo off\nfor /f \"tokens=2*\" %%a in ('reg query \"HKLM\\SOFTWARE\\WOW6432Node\\Valve\\Steam\" /v InstallPath') do @echo %%b"
-		var temp = File.new()
-		var tomp = Directory.new()
-		tomp.remove("user://tmp.bat")
-		temp.open("user://tmp.bat",File.WRITE)
-		var bat_path = ProjectSettings.globalize_path("user://tmp.bat")
-		temp.store_string(cmd_str)
-		temp.close()
-		var reg = []
-		OS.execute("cmd.exe",["/C",bat_path],true,reg)
-		if "ERROR" in reg[0]:
-			print("no steam??? wtf")
-			return
-		else:
-			steam_dir = reg[0]
-			of_dir = steam_dir + "\\steamapps\\sourcemods\\open_fortress" 
-		
-	if has_of:
-		var file = File.new()
-		if file.file_exists(of_dir + "/.revision"):
-			file.open(of_dir + "/.revision",file.READ)
-			var rev = file.get_line()
-			if rev.is_valid_integer():
-				current_revision = int(rev)
-				print(current_revision)
 
 func _ready():
-	get_of_path()
+	steam.get_of_path()
 	tvn.ua = ua
 
 func _on_Verify_pressed():
@@ -103,18 +54,17 @@ func start(verify=false):
 	$Verify.disabled = true
 	$ProgressBar.show()
 	var url = "https://toast-eu.openfortress.fun"
-	get_of_path()
-	var path = of_dir
+	var path = steam.of_dir
 	if not("/toast/" in url):
 		if url[-1] != '/':
 			url += '/'
 		url += "toast/" # basic string formatting
-	if not("open_fortress" in path):
-		if path[-1] != delim:
-			path += delim
-		path += "open_fortress" # basic string formatting
+#	if not("open_fortress" in path):
+#		if path[-1] != delim:
+#			path += delim
+#		path += "open_fortress" # this is left untill we have a path input box.
 	var installed_revision = tvn.get_installed_revision(path) # see if anythings already where we're downloading
-	print(installed_revision)
+	print("installed revision: " + str(installed_revision))
 	threads = int(tvn.dl_file_to_mem(url + "reithreads"))
 	var latest_ver = tvn.dl_file_to_mem(url + "reiversion")
 	var latest_rev = int(tvn.dl_file_to_mem(url + "revisions/latest"))
