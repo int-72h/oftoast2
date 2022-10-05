@@ -115,6 +115,7 @@ volume_db = -80.0
 
 [node name="Popup1" parent="." instance=ExtResource( 4 )]
 visible = false
+rect_min_size = Vector2( 400, 140 )
 
 [node name="SFX" type="AudioStreamPlayer" parent="."]
 

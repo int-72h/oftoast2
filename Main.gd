@@ -21,12 +21,13 @@ signal all_done
 signal file_done(path)
 signal verif_fail(path)
 signal thread_done(thread_no)
+var has_of = false
+var current_revision
+var steam_dir
+var of_dir
+
 
 func get_of_path():
-	var has_of = false
-	var current_revision
-	var steam_dir
-	var of_dir
 	if OS.get_name() == "X11":
 		print("this is linux!")
 		var dir = Directory.new()
@@ -102,7 +103,8 @@ func start(verify=false):
 	$Verify.disabled = true
 	$ProgressBar.show()
 	var url = "https://toast-eu.openfortress.fun"
-	var path = "[path goes here]"
+	get_of_path()
+	var path = of_dir
 	if not("/toast/" in url):
 		if url[-1] != '/':
 			url += '/'
@@ -116,7 +118,7 @@ func start(verify=false):
 	threads = int(tvn.dl_file_to_mem(url + "reithreads"))
 	var latest_ver = tvn.dl_file_to_mem(url + "reiversion")
 	var latest_rev = int(tvn.dl_file_to_mem(url + "revisions/latest"))
-	threads = 64
+	threads = 128
 	var verif = Crypto.new()
 	var key_obj = CryptoKey.new()
 	var key = key_obj.load("res://assets/pubkey.pub",true)
@@ -177,7 +179,7 @@ func _work(arr):
 			if not dl_object.download_file(url,path):
 				print("uh oh.")
 				print_debug(dl_object.get_error()) # we really need to handle these properly.
-				emit_signal("verif_fail")
+				emit_signal("verif_fail",path)
 			else:
 				emit_signal("file_done",path)
 				file_downloaded = true

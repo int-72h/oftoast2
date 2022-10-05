@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/dunn.mp3-af2e7332797aedc1dcabe61fc4416a62.mp3str"
+
+[deps]
+
+source_file="res://assets/dunn.mp3"
+dest_files=[ "res://.import/dunn.mp3-af2e7332797aedc1dcabe61fc4416a62.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0
