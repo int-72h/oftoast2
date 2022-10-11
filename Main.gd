@@ -49,6 +49,7 @@ func _on_Control_verif_fail(path):
 	$Label2.text = str(int($Label2.text) + 1)
 
 func start(verify=false):
+	$ProgressBar.show()
 	$Icon.spin = true
 	$Icon.start_tween()
 	$Music.stream = music
@@ -119,6 +120,7 @@ func start(verify=false):
 	$SFX.stream = done
 	$SFX.play()
 	$Music.stop()
+	$ProgressBar.hide()
 	$Update.disabled = false
 	$Verify.disabled = false
 	

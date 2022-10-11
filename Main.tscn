@@ -1,15 +1,23 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://assets/toast.png" type="Texture" id=1]
-[ext_resource path="res://assets/Staatliches-Regular.ttf" type="DynamicFontData" id=2]
+[ext_resource path="res://Oswald-Medium.ttf" type="DynamicFontData" id=2]
 [ext_resource path="res://Main.gd" type="Script" id=3]
 [ext_resource path="res://Popup.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Icon.gd" type="Script" id=5]
+[ext_resource path="res://ui_theme.tres" type="Theme" id=6]
 [ext_resource path="res://tvn.gd" type="Script" id=7]
 [ext_resource path="res://steam.gd" type="Script" id=8]
+[ext_resource path="res://PageBrain.tscn" type="PackedScene" id=9]
+[ext_resource path="res://templabel.gd" type="Script" id=10]
+[ext_resource path="res://Oswald-Bold.ttf" type="DynamicFontData" id=11]
 
 [sub_resource type="DynamicFont" id=3]
-size = 86
+size = 60
+font_data = ExtResource( 11 )
+
+[sub_resource type="DynamicFont" id=5]
+size = 33
 font_data = ExtResource( 2 )
 
 [sub_resource type="DynamicFontData" id=1]
@@ -19,9 +27,12 @@ font_path = "res://assets/Staatliches-Regular.ttf"
 size = 39
 font_data = SubResource( 1 )
 
+[sub_resource type="StyleBoxEmpty" id=4]
+
 [node name="Control" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+theme = ExtResource( 6 )
 script = ExtResource( 3 )
 
 [node name="steam" type="Control" parent="."]
@@ -33,10 +44,10 @@ script = ExtResource( 8 )
 script = ExtResource( 7 )
 
 [node name="Icon" type="TextureButton" parent="."]
-margin_left = 18.0
-margin_top = 24.0
-margin_right = 362.0
-margin_bottom = 368.0
+margin_left = 24.0
+margin_top = 160.0
+margin_right = 368.0
+margin_bottom = 504.0
 rect_scale = Vector2( 0.1, 0.1 )
 rect_pivot_offset = Vector2( 172, 172 )
 texture_normal = ExtResource( 1 )
@@ -44,89 +55,27 @@ expand = true
 script = ExtResource( 5 )
 
 [node name="Label" type="Label" parent="."]
-margin_left = 504.0
-margin_top = 144.0
-margin_right = 984.0
-margin_bottom = 269.0
+margin_left = 64.0
+margin_top = 40.0
+margin_right = 370.0
+margin_bottom = 148.0
 custom_fonts/font = SubResource( 3 )
 text = "OFTOAST II"
 
-[node name="Label4" type="Label" parent="."]
-margin_left = 496.0
-margin_top = 424.0
-margin_right = 764.0
-margin_bottom = 532.0
-custom_fonts/font = SubResource( 3 )
-text = "DL FAILS:"
-
-[node name="Label5" type="Label" parent="."]
-margin_left = 496.0
-margin_top = 336.0
-margin_right = 781.0
-margin_bottom = 444.0
-custom_fonts/font = SubResource( 3 )
-text = "THREADS:"
-
-[node name="Label6" type="Label" parent="."]
-margin_left = 496.0
-margin_top = 264.0
-margin_right = 781.0
-margin_bottom = 372.0
-custom_fonts/font = SubResource( 3 )
-text = "yes:"
-
-[node name="Label2" type="Label" parent="."]
-margin_left = 792.0
-margin_top = 424.0
-margin_right = 862.0
-margin_bottom = 549.0
-custom_fonts/font = SubResource( 3 )
-text = "0"
-
-[node name="Label3" type="Label" parent="."]
-margin_left = 792.0
-margin_top = 336.0
-margin_right = 862.0
-margin_bottom = 461.0
-custom_fonts/font = SubResource( 3 )
-text = "0"
-
-[node name="Label7" type="Label" parent="."]
-margin_left = 792.0
-margin_top = 264.0
-margin_right = 862.0
-margin_bottom = 389.0
-custom_fonts/font = SubResource( 3 )
-text = "0"
-
-[node name="Update" type="Button" parent="."]
-margin_left = 56.0
-margin_top = 416.0
-margin_right = 264.0
-margin_bottom = 480.0
-custom_fonts/font = SubResource( 2 )
-text = "Update"
-
-[node name="Verify" type="Button" parent="."]
-margin_left = 56.0
-margin_top = 520.0
-margin_right = 264.0
-margin_bottom = 584.0
-custom_fonts/font = SubResource( 2 )
-text = "Verify"
-
-[node name="Verify2" type="Button" parent="."]
-margin_left = 816.0
-margin_right = 1024.0
-margin_bottom = 64.0
-custom_fonts/font = SubResource( 2 )
-text = "force done"
+[node name="templabel" type="Label" parent="."]
+margin_left = 568.0
+margin_right = 1068.0
+margin_bottom = 108.0
+custom_fonts/font = SubResource( 5 )
+text = "Updating blog... Please wait patiently :]"
+script = ExtResource( 10 )
 
 [node name="ProgressBar" type="ProgressBar" parent="."]
-margin_left = 384.0
-margin_top = 544.0
-margin_right = 960.0
-margin_bottom = 576.0
+visible = false
+margin_left = 480.0
+margin_top = 976.0
+margin_right = 1056.0
+margin_bottom = 992.0
 percent_visible = false
 
 [node name="Music" type="AudioStreamPlayer" parent="."]
@@ -138,10 +87,78 @@ rect_min_size = Vector2( 400, 140 )
 
 [node name="SFX" type="AudioStreamPlayer" parent="."]
 
+[node name="BlogPanel" parent="." instance=ExtResource( 9 )]
+margin_left = 400.0
+margin_top = 48.0
+margin_right = -32.0
+margin_bottom = 0.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = 80.0
+margin_top = 608.0
+margin_right = 312.0
+margin_bottom = 968.0
+
+[node name="Update" type="Button" parent="VBoxContainer"]
+margin_right = 232.0
+margin_bottom = 50.0
+custom_fonts/font = SubResource( 2 )
+text = "Update"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+margin_top = 54.0
+margin_right = 232.0
+margin_bottom = 58.0
+custom_styles/separator = SubResource( 4 )
+
+[node name="HSeparator5" type="HSeparator" parent="VBoxContainer"]
+margin_top = 62.0
+margin_right = 232.0
+margin_bottom = 66.0
+custom_styles/separator = SubResource( 4 )
+
+[node name="HSeparator4" type="HSeparator" parent="VBoxContainer"]
+margin_top = 70.0
+margin_right = 232.0
+margin_bottom = 74.0
+custom_styles/separator = SubResource( 4 )
+
+[node name="Verify" type="Button" parent="VBoxContainer"]
+margin_top = 78.0
+margin_right = 232.0
+margin_bottom = 128.0
+custom_fonts/font = SubResource( 2 )
+text = "Verify"
+
+[node name="HSeparator6" type="HSeparator" parent="VBoxContainer"]
+margin_top = 132.0
+margin_right = 232.0
+margin_bottom = 136.0
+custom_styles/separator = SubResource( 4 )
+
+[node name="HSeparator2" type="HSeparator" parent="VBoxContainer"]
+margin_top = 140.0
+margin_right = 232.0
+margin_bottom = 144.0
+
+[node name="HSeparator3" type="HSeparator" parent="VBoxContainer"]
+margin_top = 148.0
+margin_right = 232.0
+margin_bottom = 152.0
+custom_styles/separator = SubResource( 4 )
+
+[node name="Update2" type="Button" parent="VBoxContainer"]
+margin_top = 156.0
+margin_right = 232.0
+margin_bottom = 206.0
+custom_fonts/font = SubResource( 2 )
+text = "Advanced"
+
 [connection signal="file_done" from="." to="." method="_on_Control_file_done"]
 [connection signal="thread_done" from="." to="." method="_on_Control_thread_done"]
 [connection signal="verif_fail" from="." to="." method="_on_Control_verif_fail"]
 [connection signal="pressed" from="Icon" to="Icon" method="_on_Icon_pressed"]
-[connection signal="pressed" from="Update" to="." method="_on_Update_pressed"]
-[connection signal="pressed" from="Verify" to="." method="_on_Verify_pressed"]
-[connection signal="pressed" from="Verify2" to="." method="_on_Verify2_pressed"]
+[connection signal="draw_blog" from="BlogPanel" to="templabel" method="_on_BlogPanel_draw_blog"]
+[connection signal="pressed" from="VBoxContainer/Update" to="." method="_on_Update_pressed"]
+[connection signal="pressed" from="VBoxContainer/Verify" to="." method="_on_Verify_pressed"]
+[connection signal="pressed" from="VBoxContainer/Update2" to="." method="_on_Update_pressed"]

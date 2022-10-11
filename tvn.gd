@@ -50,6 +50,15 @@ func get_installed_revision(dir):
 	else:
 		return int(file.get_as_text())
 
+func download_file(url,path):
+	var data = GDDL.new()
+	data.set_agent(ua)
+	data.download_file(url,path)
+	if not data:
+		error_handler(data.get_error())
+	else:
+		return data
+
 
 func dl_file_to_mem(url,bin=false):
 	var data = GDDL.new()
@@ -64,7 +73,7 @@ func dl_file_to_mem(url,bin=false):
 	else:
 		var z = data.download_to_array(url)
 		if not z:
-			error_handler(data.get_error())
+			print(data.get_error())
 		return z
 	
 func error_handler(error):
