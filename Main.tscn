@@ -56,9 +56,9 @@ script = ExtResource( 5 )
 
 [node name="Label" type="Label" parent="."]
 margin_left = 64.0
-margin_top = 40.0
+margin_top = 8.0
 margin_right = 370.0
-margin_bottom = 148.0
+margin_bottom = 116.0
 custom_fonts/font = SubResource( 3 )
 text = "OFTOAST II"
 
@@ -70,14 +70,6 @@ custom_fonts/font = SubResource( 5 )
 text = "Updating blog... Please wait patiently :]"
 script = ExtResource( 10 )
 
-[node name="ProgressBar" type="ProgressBar" parent="."]
-visible = false
-margin_left = 480.0
-margin_top = 976.0
-margin_right = 1056.0
-margin_bottom = 992.0
-percent_visible = false
-
 [node name="Music" type="AudioStreamPlayer" parent="."]
 volume_db = -80.0
 
@@ -86,12 +78,6 @@ visible = false
 rect_min_size = Vector2( 400, 140 )
 
 [node name="SFX" type="AudioStreamPlayer" parent="."]
-
-[node name="BlogPanel" parent="." instance=ExtResource( 9 )]
-margin_left = 400.0
-margin_top = 48.0
-margin_right = -32.0
-margin_bottom = 0.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 margin_left = 80.0
@@ -154,11 +140,38 @@ margin_bottom = 206.0
 custom_fonts/font = SubResource( 2 )
 text = "Advanced"
 
+[node name="VBoxContainer2" type="VBoxContainer" parent="."]
+margin_left = 400.0
+margin_top = 48.0
+margin_right = 1152.0
+margin_bottom = 1072.0
+
+[node name="BlogPanel" parent="VBoxContainer2" instance=ExtResource( 9 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 0.0
+margin_top = 0.0
+margin_right = 752.0
+margin_bottom = 0.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer2"]
+visible = false
+margin_right = 752.0
+margin_bottom = 500.0
+rect_min_size = Vector2( 752, 500 )
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+margin_left = 440.0
+margin_top = 968.0
+margin_right = 1128.0
+margin_bottom = 984.0
+percent_visible = false
+
 [connection signal="file_done" from="." to="." method="_on_Control_file_done"]
 [connection signal="thread_done" from="." to="." method="_on_Control_thread_done"]
 [connection signal="verif_fail" from="." to="." method="_on_Control_verif_fail"]
 [connection signal="pressed" from="Icon" to="Icon" method="_on_Icon_pressed"]
-[connection signal="draw_blog" from="BlogPanel" to="templabel" method="_on_BlogPanel_draw_blog"]
 [connection signal="pressed" from="VBoxContainer/Update" to="." method="_on_Update_pressed"]
 [connection signal="pressed" from="VBoxContainer/Verify" to="." method="_on_Verify_pressed"]
 [connection signal="pressed" from="VBoxContainer/Update2" to="." method="_on_Update_pressed"]
+[connection signal="draw_blog" from="VBoxContainer2/BlogPanel" to="templabel" method="_on_BlogPanel_draw_blog"]

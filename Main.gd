@@ -23,7 +23,9 @@ signal file_done(path)
 signal verif_fail(path)
 signal thread_done(thread_no)
 
+
 func _ready():
+	var gd = GDDL.new()
 	if OS.get_name() == "X11":
 		delim = "/"
 	else:
@@ -37,17 +39,10 @@ func _on_Verify_pressed():
 func _on_Update_pressed():
 	start()
 
-func _on_Control_file_done(path):
-	$ProgressBar.value += 1
-	$Label7.text =  str(int($Label7.text) + 1)
 
-func _on_Control_thread_done(thread_no):
-	$Label3.text = str(int($Label3.text) + 1)
-
-
-func _on_Control_verif_fail(path):
-	$Label2.text = str(int($Label2.text) + 1)
-
+func _on_Control_file_done(_eggs):
+	$ProgressBar.value +=1
+	
 func start(verify=false):
 	$ProgressBar.show()
 	$Icon.spin = true
@@ -56,8 +51,8 @@ func start(verify=false):
 	$SFX.stream = start
 	$SFX.play()
 	$Music.play()
-	$Update.disabled = true
-	$Verify.disabled = true
+	$VBoxContainer/Update.disabled = true
+	$VBoxContainer/Verify.disabled = true
 	$ProgressBar.show()
 	var url = "https://toast-eu.openfortress.fun"
 	var path = steam.of_dir
@@ -78,40 +73,46 @@ func start(verify=false):
 	var verif = Crypto.new()
 	var key_obj = CryptoKey.new()
 	var key = key_obj.load("res://assets/pubkey.pub",true)
-	installed_revision = -1
-	var revisions = tvn.fetch_revisions(url,installed_revision,latest_rev,verif,key_obj)
-	var changes = tvn.replay_changes(revisions)
-	var writes = filter(tvn.TYPE_WRITE,changes)
-	var dl_array = []
-	for x in writes:
-		dl_array.append([url + "objects/" + x["object"], path + delim + x["path"],x["hash"]])
-	for x in filter(tvn.TYPE_DELETE,changes):
-		var error
-		var dir = Directory.new()
-		if dir.file_exists(path + delim + x["path"]):
-			error = dir.remove(path + delim + x["path"])
-			if error != OK:
-				print_debug(error)
-	for x in filter(tvn.TYPE_MKDIR,changes):
-		var error
-		var dir = Directory.new()
-		error = dir.make_dir_recursive(path +delim+ x["path"])
-		if error != OK and (error != 20):
-			print_debug(error)
-	var error
-	var dir = Directory.new()
-	error = dir.remove(path + "/.revision")
-	if error != OK:
-		print_debug(error)
-	$ProgressBar.max_value = len(dl_array)
-	if verify == false:
-		 work(dl_array)
+	if installed_revision == -1 and verify == false: # the zip thing
+		var t = Thread.new()
+		arr_of_threads.append(t)
+		arr_of_threads[0].start(self,"_dozip",["",path]) ## no url as it hasn't been implemented serverside yet
 	else:
-		verify(dl_array)
-		pass
+		if verify:
+			installed_revision = -1
+		var revisions = tvn.fetch_revisions(url,installed_revision,latest_rev,verif,key_obj)
+		var changes = tvn.replay_changes(revisions)
+		var writes = filter(tvn.TYPE_WRITE,changes)
+		var dl_array = []
+		for x in writes:
+			dl_array.append([url + "objects/" + x["object"], path + delim + x["path"],x["hash"]])
+		for x in filter(tvn.TYPE_DELETE,changes):
+			var error
+			var dir = Directory.new()
+			if dir.file_exists(path + delim + x["path"]):
+				error = dir.remove(path + delim + x["path"])
+				if error != OK:
+					print_debug(error)
+		for x in filter(tvn.TYPE_MKDIR,changes):
+			var error
+			var dir = Directory.new()
+			error = dir.make_dir_recursive(path +delim+ x["path"])
+			if error != OK and (error != 20):
+				print_debug(error)
+		var error
+		var dir = Directory.new()
+		error = dir.remove(path + "/.revision")
+		if error != OK:
+			print_debug(error)
+		$ProgressBar.max_value = len(dl_array)
+		if verify == false:
+			 work(dl_array)
+		else:
+			verify(dl_array)
+			pass
 	yield(self,"all_done")
 	var file = File.new()
-	error = file.open(path+ '/.revision', File.WRITE)
+	var error = file.open(path+ '/.revision', File.WRITE)
 	if error != OK:
 		print_debug(error)
 	file.store_string(str(latest_rev))
@@ -121,9 +122,23 @@ func start(verify=false):
 	$SFX.play()
 	$Music.stop()
 	$ProgressBar.hide()
-	$Update.disabled = false
-	$Verify.disabled = false
+	$VBoxContainer/Update.disabled = false
+	$VBoxContainer/Verify.disabled = false
 	
+
+func _dozip(arr):
+	var url = arr[0]
+	var path = arr[1]
+	var dl_object = GDDL.new()
+	var ziploc = ProjectSettings.globalize_path("user://latest.zip")
+	if not dl_object.download_file(url,ziploc):
+		print("uh oh.") # do more error handling
+	var z = dl_object.unzip(ziploc,path)
+	if z != "0":
+		print("uh oh.")
+	var f = Directory.new()
+	f.remove(ziploc) ## delete zipx
+	done_threads_arr.append(0)
 
 func _work(arr):
 	var arr_of_files = arr[0]

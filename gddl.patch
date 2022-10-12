@@ -1,0 +1,106 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 38b6407..6b8b358 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,6 +1,6 @@
+ # min version could probably be less than this.
+ cmake_minimum_required(VERSION 3.20)
+-
++add_subdirectory(zip)
+ if (WIN32)
+     set(PLATFORM windows)
+ else()
+@@ -76,4 +76,4 @@ include_directories(${CURL_INCLUDE_DIRS})
+ 
+ add_library(${PROJECT_NAME} SHARED ${SOURCES})
+ 
+-target_link_libraries(${PROJECT_NAME} ${CURL_LIBRARIES})
+\ No newline at end of file
++target_link_libraries(${PROJECT_NAME} ${CURL_LIBRARIES} zip)
+diff --git a/src/gddl.c b/src/gddl.c
+index c073265..97c7b70 100644
+--- a/src/gddl.c
++++ b/src/gddl.c
+@@ -71,6 +71,7 @@ GD_METHOD(gddl_download_to_string);
+ GD_METHOD(gddl_download_to_array);
+ GD_METHOD(gddl_set_agent);
+ GD_METHOD(gddl_get_error);
++GD_METHOD(gddl_unzip);
+ 
+ // `gdnative_init` is a function that initializes our dynamic library.
+ // Godot will give it a pointer to a structure that contains various bits of
+@@ -124,6 +125,7 @@ void GDN_EXPORT godot_nativescript_init(void *p_handle) {
+ 	INIT_GD_METHOD(download_to_array);
+ 	INIT_GD_METHOD(set_agent);
+ 	INIT_GD_METHOD(get_error);
++	INIT_GD_METHOD(unzip);
+ 
+ }
+ 
+@@ -247,6 +249,8 @@ GD_METHOD(gddl_download_to_string) {
+ 
+ GD_METHOD(gddl_download_to_array) {
+ 	user_data_struct *user_data = (user_data_struct *)p_user_data;
++	godot_pool_byte_array ba;
++	api->godot_pool_byte_array_new(&ba);
+ 	godot_variant ret;
+ 
+ 	if (p_num_args < 1) {
+@@ -261,9 +265,6 @@ GD_METHOD(gddl_download_to_array) {
+ 	godot_char_string url_char_string = api->godot_string_utf8(&gd_url);
+ 	const char *url = api->godot_char_string_get_data(&url_char_string);
+ 
+-	godot_pool_byte_array ba;
+-	api->godot_pool_byte_array_new(&ba);
+-
+ 	curl_easy_setopt(user_data->curl, CURLOPT_URL, url);
+ 	curl_easy_setopt(user_data->curl, CURLOPT_WRITEFUNCTION, write_data_to_binary);
+ 	curl_easy_setopt(user_data->curl, CURLOPT_WRITEDATA, &ba);
+@@ -335,4 +336,25 @@ GD_METHOD(gddl_get_error) {
+ 	api->godot_variant_new_string(&ret, &str);
+ 
+ 	return ret;
+-}
+\ No newline at end of file
++}
++
++GD_METHOD(gddl_unzip){
++	user_data_struct *user_data = (user_data_struct *)p_user_data;
++	godot_variant ret;
++	godot_string str;
++	api->godot_string_new(&str);
++	if (p_num_args < 2)
++		return ret;
++	godot_string zip_name = api->godot_variant_as_string(p_args[0]);
++	godot_char_string temp = api->godot_string_utf8(&zip_name);
++	const char* zip_str = api->godot_char_string_get_data(&temp);
++	godot_string path = api->godot_variant_as_string(p_args[1]);
++	godot_char_string tmp = api->godot_string_utf8(&path);
++	const char* path_str = api->godot_char_string_get_data(&tmp);
++	int retv = zip_extract(zip_str,path_str,NULL,NULL); // hope this bloody well works
++	char buf[3];
++	sprintf(buf, "%i",retv);
++	api->godot_string_parse_utf8(&str,buf);
++	api->godot_variant_new_string(&ret,&str);
++	return ret;
++}
+diff --git a/src/gddl.h b/src/gddl.h
+index 88f07c6..b3ac511 100644
+--- a/src/gddl.h
++++ b/src/gddl.h
+@@ -5,7 +5,7 @@
+ #include <string.h>
+ #include <stdlib.h>
+ #include <curl/curl.h>
+-
++#include <zip.h>
+ #define GD_METHOD(fname) godot_variant fname(godot_object *p_instance, void *p_method_data, void *p_user_data, int p_num_args, godot_variant **p_args)
+ 
+ #define INIT_GD_METHOD(fname) \
+@@ -13,4 +13,4 @@
+     fname.method = &gddl_##fname; \
+     nativescript_api->godot_nativescript_register_method(p_handle, "GDDL", #fname, attributes, fname)
+ 
+-#endif //GDDL_H
+\ No newline at end of file
++#endif //GDDL_H
