@@ -18,20 +18,30 @@ var failed_files = []
 var threads = 8
 var delim = ""
 const ua = "murse/0.3.0" # temporary
+var installed_revision
+var latest_rev
 signal all_done
 signal file_done(path)
 signal verif_fail(path)
 signal thread_done(thread_no)
-
+var path
 
 func _ready():
+	tvn.ua = ua
+	var url = "https://toast-eu.openfortress.fun"
+	tvn.set_url(url)
+	print(tvn.url)
 	var gd = GDDL.new()
 	if OS.get_name() == "X11":
 		delim = "/"
 	else:
 		delim = "\\"
 	steam.get_of_path()
-	tvn.ua = ua
+	path = steam.of_dir
+	installed_revision = tvn.get_installed_revision(path) # see if anythings already where we're downloading
+	print("installed revision: " + str(installed_revision))
+	threads = int(tvn.dl_file_to_mem("reithreads"))
+	latest_rev = int(tvn.dl_file_to_mem("revisions/latest"))
 
 func _on_Verify_pressed():
 	start(true)
@@ -54,38 +64,24 @@ func start(verify=false):
 	$VBoxContainer/Update.disabled = true
 	$VBoxContainer/Verify.disabled = true
 	$ProgressBar.show()
-	var url = "https://toast-eu.openfortress.fun"
-	var path = steam.of_dir
-	if not("/toast/" in url):
-		if url[-1] != '/':
-			url += '/'
-		url += "toast/" # basic string formatting
 #	if not("open_fortress" in path):
 #		if path[-1] != delim:
 #			path += delim
 #		path += "open_fortress" # this is left untill we have a path input box.
-	var installed_revision = tvn.get_installed_revision(path) # see if anythings already where we're downloading
-	print("installed revision: " + str(installed_revision))
-	threads = int(tvn.dl_file_to_mem(url + "reithreads"))
-	var latest_ver = tvn.dl_file_to_mem(url + "reiversion")
-	var latest_rev = int(tvn.dl_file_to_mem(url + "revisions/latest"))
-	threads = 128
-	var verif = Crypto.new()
-	var key_obj = CryptoKey.new()
-	var key = key_obj.load("res://assets/pubkey.pub",true)
 	if installed_revision == -1 and verify == false: # the zip thing
 		var t = Thread.new()
 		arr_of_threads.append(t)
 		arr_of_threads[0].start(self,"_dozip",["",path]) ## no url as it hasn't been implemented serverside yet
 	else:
+		installed_revision = -1
 		if verify:
 			installed_revision = -1
-		var revisions = tvn.fetch_revisions(url,installed_revision,latest_rev,verif,key_obj)
+		var revisions = tvn.fetch_revisions(installed_revision,latest_rev)
 		var changes = tvn.replay_changes(revisions)
 		var writes = filter(tvn.TYPE_WRITE,changes)
 		var dl_array = []
 		for x in writes:
-			dl_array.append([url + "objects/" + x["object"], path + delim + x["path"],x["hash"]])
+			dl_array.append([tvn.url + "objects/" + x["object"], path + delim + x["path"],x["hash"]])
 		for x in filter(tvn.TYPE_DELETE,changes):
 			var error
 			var dir = Directory.new()
@@ -106,7 +102,8 @@ func start(verify=false):
 			print_debug(error)
 		$ProgressBar.max_value = len(dl_array)
 		if verify == false:
-			 work(dl_array)
+			work(dl_array)
+			pass
 		else:
 			verify(dl_array)
 			pass
@@ -126,12 +123,14 @@ func start(verify=false):
 	$VBoxContainer/Verify.disabled = false
 	
 
+
+
 func _dozip(arr):
 	var url = arr[0]
 	var path = arr[1]
 	var dl_object = GDDL.new()
 	var ziploc = ProjectSettings.globalize_path("user://latest.zip")
-	if not dl_object.download_file(url,ziploc):
+	if not tvn.download_file(url,ziploc):
 		print("uh oh.") # do more error handling
 	var z = dl_object.unzip(ziploc,path)
 	if z != "0":

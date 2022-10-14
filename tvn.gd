@@ -3,10 +3,15 @@ class_name tvn
 const GDDL = preload("res://gdnative/gddl.gdns")
 var revisions = []
 var ua = ""
+var url
+var key_obj =  CryptoKey.new()
+var verif = Crypto.new()
 const TYPE_WRITE = 0
 const TYPE_DELETE = 2
 const TYPE_MKDIR = 1
 
+func _ready():
+	key_obj.load("res://assets/pubkey.pub",true)
 
 func replay_changes(changesets):
 	var cumlmap = {}
@@ -50,28 +55,27 @@ func get_installed_revision(dir):
 	else:
 		return int(file.get_as_text())
 
-func download_file(url,path):
+func download_file(urlpart,path):
 	var data = GDDL.new()
 	data.set_agent(ua)
-	data.download_file(url,path)
+	data.download_file(url + urlpart,path)
 	if not data:
 		error_handler(data.get_error())
 	else:
 		return data
 
 
-func dl_file_to_mem(url,bin=false):
+func dl_file_to_mem(urlpart,bin=false):
 	var data = GDDL.new()
 	data.set_agent(ua)
-	print(url)
 	if bin == false:
-		var ret = data.download_to_string(url)
+		var ret = data.download_to_string(url + urlpart)
 		if ret:
 			return ret
 		else:
 			error_handler(data.get_error())
 	else:
-		var z = data.download_to_array(url)
+		var z = data.download_to_array(url+ urlpart)
 		if not z:
 			print(data.get_error())
 		return z
@@ -86,15 +90,36 @@ func error_handler(error):
 	
 	
 
-func fetch_revisions(url, first, last, verif,key):
+func get_mirrors(url):
+	var mirrorlist # do mirror things idk
+
+
+func get_tag(revision):
+	var dl = GDDL.new()
+	var rev = dl_file_to_mem("/revisions/" + str(revision))
+	var sig = dl_file_to_mem("/revisions/" + str(revision) + ".sig",true)
+	var verified = verif.verify(HashingContext.HASH_SHA256, rev.sha256_buffer(), sig, key_obj)
+	var rev_json = JSON.parse(rev)
+	return revision["tag"]
+
+func set_url(_url):
+	if not("/toast/" in _url):
+		if _url[-1] != '/':
+			_url += '/'
+	_url += "toast/" # basic string formatting
+	url = _url
+
+
+func fetch_revisions(first, last):
 	for x in range(first+1,last+1):
 		if not (x<0):
 			var error = false
 			var dl = GDDL.new()
-			var rev = dl_file_to_mem(url + "/revisions/" + str(x))
-			var sig = dl_file_to_mem(url + "/revisions/" + str(x) + ".sig",true)
-			var verified = verif.verify(HashingContext.HASH_SHA256, rev.sha256_buffer(), sig, key)
-			var rev_json = JSON.parse(rev) ## handle the eror here
+			dl.set_agent(ua)
+			var rev = dl_file_to_mem("revisions/" + str(x))
+			var sig = dl_file_to_mem("revisions/" + str(x) + ".sig",true)
+			var verified = verif.verify(HashingContext.HASH_SHA256, rev.sha256_buffer(), sig, key_obj)
+			var rev_json = JSON.parse(rev) ## handle the error here
 			#if rev_json.result["revision"] != x:
 			#	error = true
 			if (error == true) or (rev_json.error != OK):
