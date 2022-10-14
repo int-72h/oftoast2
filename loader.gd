@@ -12,6 +12,6 @@ func _ready():
 #			var exec_path = ProjectSettings.globalize_path("user://" + newver)
 #			gd.download_file("/latest_launcher_ver_linux",exec_path) # download latest launcher...
 #			var cmd_str = exec_path + "& kill " + str(pid) 
-#			OS.execute("cmd.exe",["-c",cmd_str])
+#			OS.execute("/bin/bash",["-c",cmd_str])
 		
 	get_tree().change_scene("res://Main.tscn")

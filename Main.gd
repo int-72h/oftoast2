@@ -26,6 +26,12 @@ signal verif_fail(path)
 signal thread_done(thread_no)
 var path
 
+func _on_draw_blog():
+	var tween = get_tree().create_tween().set_parallel(true)
+	tween.tween_property($TextureRect,"modulate",Color.transparent,1)
+	yield(get_tree().create_timer(1), "timeout")
+	$TextureRect.hide()
+
 func _ready():
 	tvn.ua = ua
 	var url = "https://toast-eu.openfortress.fun"
@@ -42,6 +48,7 @@ func _ready():
 	print("installed revision: " + str(installed_revision))
 	threads = int(tvn.dl_file_to_mem("reithreads"))
 	latest_rev = int(tvn.dl_file_to_mem("revisions/latest"))
+	revisions = tvn.fetch_revisions(installed_revision,latest_rev)
 
 func _on_Verify_pressed():
 	start(true)
@@ -73,10 +80,9 @@ func start(verify=false):
 		arr_of_threads.append(t)
 		arr_of_threads[0].start(self,"_dozip",["",path]) ## no url as it hasn't been implemented serverside yet
 	else:
-		installed_revision = -1
+		#installed_revision = -1
 		if verify:
 			installed_revision = -1
-		var revisions = tvn.fetch_revisions(installed_revision,latest_rev)
 		var changes = tvn.replay_changes(revisions)
 		var writes = filter(tvn.TYPE_WRITE,changes)
 		var dl_array = []
@@ -127,12 +133,12 @@ func start(verify=false):
 
 func _dozip(arr):
 	var url = arr[0]
-	var path = arr[1]
+	var lpath = arr[1]
 	var dl_object = GDDL.new()
 	var ziploc = ProjectSettings.globalize_path("user://latest.zip")
 	if not tvn.download_file(url,ziploc):
 		print("uh oh.") # do more error handling
-	var z = dl_object.unzip(ziploc,path)
+	var z = dl_object.unzip(ziploc,lpath)
 	if z != "0":
 		print("uh oh.")
 	var f = Directory.new()

@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://assets/toast.png" type="Texture" id=1]
 [ext_resource path="res://Oswald-Medium.ttf" type="DynamicFontData" id=2]
@@ -11,6 +11,7 @@
 [ext_resource path="res://PageBrain.tscn" type="PackedScene" id=9]
 [ext_resource path="res://templabel.gd" type="Script" id=10]
 [ext_resource path="res://Oswald-Bold.ttf" type="DynamicFontData" id=11]
+[ext_resource path="res://unknown.png" type="Texture" id=12]
 
 [sub_resource type="DynamicFont" id=3]
 size = 60
@@ -167,6 +168,12 @@ margin_right = 1128.0
 margin_bottom = 984.0
 percent_visible = false
 
+[node name="TextureRect" type="TextureRect" parent="."]
+margin_left = -361.0
+margin_right = 1559.0
+margin_bottom = 1080.0
+texture = ExtResource( 12 )
+
 [connection signal="file_done" from="." to="." method="_on_Control_file_done"]
 [connection signal="thread_done" from="." to="." method="_on_Control_thread_done"]
 [connection signal="verif_fail" from="." to="." method="_on_Control_verif_fail"]
@@ -174,4 +181,5 @@ percent_visible = false
 [connection signal="pressed" from="VBoxContainer/Update" to="." method="_on_Update_pressed"]
 [connection signal="pressed" from="VBoxContainer/Verify" to="." method="_on_Verify_pressed"]
 [connection signal="pressed" from="VBoxContainer/Update2" to="." method="_on_Update_pressed"]
+[connection signal="draw_blog" from="VBoxContainer2/BlogPanel" to="." method="_on_draw_blog"]
 [connection signal="draw_blog" from="VBoxContainer2/BlogPanel" to="templabel" method="_on_BlogPanel_draw_blog"]
