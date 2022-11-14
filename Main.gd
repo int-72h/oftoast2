@@ -33,9 +33,10 @@ func _on_draw_blog():
 	$TextureRect.hide()
 
 func _ready():
+	$advlabel.rect_position = Vector2(-800,0)
+	$AdvancedPanel.rect_position = Vector2(-800,150)
 	tvn.ua = ua
-	var url = "https://toast-eu.openfortress.fun"
-	tvn.set_url(url)
+	var url = "https://toast1.openfortress.fun/toast/"
 	print(tvn.url)
 	var gd = GDDL.new()
 	if OS.get_name() == "X11":
@@ -43,11 +44,12 @@ func _ready():
 	else:
 		delim = "\\"
 	steam.get_of_path()
+	steam.check_tf2_sdk_exists()
 	path = steam.of_dir
 	installed_revision = tvn.get_installed_revision(path) # see if anythings already where we're downloading
 	print("installed revision: " + str(installed_revision))
-	threads = int(tvn.dl_file_to_mem("reithreads"))
-	latest_rev = int(tvn.dl_file_to_mem("revisions/latest"))
+	threads = int(tvn.dl_file_to_mem(url + "/reithreads"))
+	latest_rev = int(tvn.dl_file_to_mem(url + "/revisions/latest"))
 	revisions = tvn.fetch_revisions(installed_revision,latest_rev)
 
 func _on_Verify_pressed():
@@ -128,8 +130,6 @@ func start(verify=false):
 	$VBoxContainer/Update.disabled = false
 	$VBoxContainer/Verify.disabled = false
 	
-
-
 
 func _dozip(arr):
 	var url = arr[0]
@@ -238,3 +238,38 @@ func _process(delta):
 		done_threads_arr = []
 	if done_threads == threads:
 		emit_signal("all_done")
+
+
+
+
+func _on_Advanced_pressed():
+	var transition = Tween.TRANS_BACK
+	var easeing = Tween.EASE_IN_OUT
+	var time = 0.75
+	if !$AdvancedPanel.visible:
+		$AdvancedPanel.visible = true
+		$advlabel.visible = true
+		$VBoxContainer/Advanced.disabled = true
+		$AdvancedPanel.rect_position = Vector2(-800,150)
+		$advlabel.rect_position = Vector2(-700,150)
+		var tween = get_tree().create_tween().set_parallel(true)
+		tween.tween_property($AdvancedPanel,"rect_position",Vector2(400,150),time).set_trans(transition).set_ease(easeing)
+		#yield(get_tree().create_timer(0.1),"timeout")
+		tween.tween_property($advlabel,"rect_position",Vector2(408,0),time).set_trans(transition).set_ease(easeing)
+		tween.tween_property($BlogPanel/TabContainer,"modulate",Color.transparent,time).set_trans(transition).set_ease(easeing)
+		tween.tween_property($templabel,"modulate",Color.transparent,time).set_trans(transition).set_ease(easeing)
+		yield(get_tree().create_timer(time),"timeout")
+		$BlogPanel.visible = !$BlogPanel.visible
+		$VBoxContainer/Advanced.disabled = false
+	else:
+		$BlogPanel.visible = true
+		$VBoxContainer/Advanced.disabled = true
+		var tween = get_tree().create_tween().set_parallel(true)
+		tween.tween_property($AdvancedPanel,"rect_position",Vector2(-800,150),time).set_trans(transition).set_ease(easeing)
+		tween.tween_property($advlabel,"rect_position",Vector2(-800,150),time).set_trans(transition).set_ease(easeing)
+		tween.tween_property($BlogPanel/TabContainer,"modulate",Color.white,time).set_trans(transition).set_ease(easeing)
+		tween.tween_property($templabel,"modulate",Color.white,time).set_trans(transition).set_ease(easeing)
+		yield(get_tree().create_timer(0.5),"timeout")
+		$AdvancedPanel.visible = !$AdvancedPanel.visible
+		$VBoxContainer/Advanced.disabled = false
+		$advlabel.visible = false

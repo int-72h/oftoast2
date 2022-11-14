@@ -47,3 +47,18 @@ func get_of_path():
 		else:
 			steam_dir = reg[0].split("\n")[0].strip_edges()
 			of_dir = steam_dir + "\\steamapps\\sourcemods\\open_fortress"
+
+
+
+func check_tf2_sdk_exists():
+	var f = File.new()
+	f.open(steam_dir + "/steamapps/libraryfolders.vdf",File.READ)
+	var z = f.get_as_text()
+	if "243750" in z:
+		print("we got the sdk")
+		sdk_exists = true
+	if "440" in z:
+		print("we got tf2")
+		tf2_exists = true
+			
+			

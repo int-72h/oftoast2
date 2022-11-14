@@ -1,5 +1,6 @@
 extends Control
 const GDDL = preload("res://gdnative/gddl.gdns")
+onready var tvn = get_node("/root/Control/tvn")
 enum {
 	HTML_P,
 	HTML_H1,
@@ -31,7 +32,13 @@ func html2bbcode(pageText):
 
 func _ready():
 	connect("thread_done",self,"on_thread_done")
-	xml_parse(or_else_it_gets_the_hose("https://openfortress.fun/blog/rss/feed")) # get rss
+	var t = Thread.new()
+#	t.start(self,"or_else_it_gets_the_hose_t","https://openfortress.fun/blog/rss/feed") # start 2 threads, one has the timer, the other waits. if the timer expires first can the first thread and error
+#	yield(get_tree().create_timer(5),"timeout")
+#	if t.is_alive():
+#		print("WE'RE HANGING HERE...")
+#		get_node("/root/Control").queue_free()
+	xml_parse(tvn.dl_file_to_mem("https://openfortress.fun/blog/rss/feed",false)) # get rss
 
 signal draw_blog()
 signal thread_done(tab_no)
@@ -39,7 +46,9 @@ var txt_bullet = "[EPICBOOL]"; # used for replacing list bullets in final steps
 var title_arr = []
 var desc_arr = []
 var tot_rev
+var done_drawing = false
 var gddl = GDDL.new()
+var tmp
 onready var rtl1 = $TabContainer/PageViewer/RichTextLabel
 onready var rtl2 = $TabContainer/PageViewer2/RichTextLabel
 onready var rtl3 = $TabContainer/PageViewer3/RichTextLabel
@@ -115,14 +124,13 @@ func display_text(arr):
 		tab.set_tab_title(tab_no,html2bbcode(titleText))
 	for i in bb_parsed:
 		rtl.append_bbcode(i)
-	donethreads.append(tab_no)
-var donethreads = []
-var t = [Thread.new(),Thread.new(),Thread.new()]
+		
 func xml_parse(body):
 	var p = XMLParser.new()
 	var in_item_node = false
 	var in_title_node = false
 	var in_description_node = false
+	body = body.to_utf8()
 	p.open_buffer(body)
 	while p.read() == OK:
 		var node_type = p.get_node_type()
@@ -132,7 +140,6 @@ func xml_parse(body):
 			node_data = p.get_node_data() # doesn't work if not text
 		else:
 			node_name = p.get_node_name() # doesn't work if text
-		
 		if(node_name == "item"):
 			in_item_node = !in_item_node #toggle item mode
 
@@ -145,43 +152,27 @@ func xml_parse(body):
 			continue
 			
 		if(in_description_node == true):
-			# print("description-data" + node_data)
 			if node_type == XMLParser.NODE_TEXT:
 				desc_arr.append(node_data)
 			else:
-				# print("description:" + node_name)
+				print("description:" + node_name)
 				desc_arr.append(node_name)
 		
 		if(in_title_node == true):
-			# print("Title-data:"+ node_data)
 			if node_type == XMLParser.NODE_TEXT:
 				title_arr.append(node_data)
 			else:
-				# print("Title:" + node_name)
+				print("Title:" + node_name)
 				title_arr.append(node_name)
 	tot_rev = len(title_arr)
-	t[0].start(self,"display_text",[rtl1,0,0])
-	t[1].start(self,"display_text",[rtl2,1,1])
-	t[2].start(self,"display_text",[rtl3,2,2])
-#	display_text(rtl1,0,0)
-#	display_text(rtl2,1,1)
-#	display_text(rtl3,2,2)
+	display_text([rtl1,0,0])
+	display_text([rtl2,1,1])
+	display_text([rtl3,2,2])
+	emit_signal("draw_blog")
+	tab.tabs_visible = true
 
 #
-func or_else_it_gets_the_hose(url): # IT RETRIES THE DOWNLOAD OR ELSE IT GETS THE HOSE
-	print("DOWNLOADING STUFF")
-	var dld = false
-	var dl = GDDL.new()
-	while not dld:
-		var body = dl.download_file(url,ProjectSettings.globalize_path("user://test.png"))
-		if not body:
-			print(dl.get_error())
-			continue
-		else:
-			var f = File.new()
-			f.open("user://test.png",File.READ)
-			var z = f.get_buffer(f.get_len())
-			return z
+			
 	
 func genthumbnail(name):
 	var thumbnail_path = "user://thumb_" + name + ".png"
@@ -220,15 +211,5 @@ func gen_tres(image_name):
 	print(imageName+" ~ "+str(saved));
 	
 func _process(_delta):
-	if t == [null,null,null]:
-		if tab.tabs_visible == false:
-			tab.tabs_visible = true
-			emit_signal("draw_blog")
-	else:
-		for x in donethreads:
-			print("UPDATING....")
-			t[x].wait_to_finish()
-			tab.update()
-			donethreads.pop_front()
-			t[x] = null
+	pass
 	

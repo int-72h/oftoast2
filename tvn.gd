@@ -55,27 +55,27 @@ func get_installed_revision(dir):
 	else:
 		return int(file.get_as_text())
 
-func download_file(urlpart,path):
+func download_file(url,path):
 	var data = GDDL.new()
 	data.set_agent(ua)
-	data.download_file(url + urlpart,path)
+	data.download_file(url,path)
 	if not data:
 		error_handler(data.get_error())
 	else:
 		return data
 
 
-func dl_file_to_mem(urlpart,bin=false):
+func dl_file_to_mem(url,bin=false):
 	var data = GDDL.new()
 	data.set_agent(ua)
 	if bin == false:
-		var ret = data.download_to_string(url + urlpart)
+		var ret = data.download_to_string(url)
 		if ret:
 			return ret
 		else:
 			error_handler(data.get_error())
 	else:
-		var z = data.download_to_array(url+ urlpart)
+		var z = data.download_to_array(url)
 		if not z:
 			print(data.get_error())
 		return z

@@ -25,16 +25,17 @@ theme = ExtResource( 2 )
 script = ExtResource( 1 )
 
 [node name="TabContainer" type="TabContainer" parent="."]
-margin_left = 3.0
-margin_top = 5.0
-margin_right = 755.0
-margin_bottom = 1020.0
+margin_right = 760.0
+margin_bottom = 1015.0
 tab_align = 0
 tabs_visible = false
 
 [node name="PageViewer" type="ScrollContainer" parent="TabContainer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_left = 4.0
+margin_right = -4.0
+margin_bottom = -4.0
 custom_styles/bg = SubResource( 1 )
 scroll_horizontal_enabled = false
 
@@ -42,21 +43,23 @@ scroll_horizontal_enabled = false
 margin_left = 16.0
 margin_top = 16.0
 margin_right = 736.0
-margin_bottom = 197.0
+margin_bottom = 230.0
 rect_min_size = Vector2( 720, 0 )
 rect_clip_content = false
 custom_styles/normal = SubResource( 2 )
 bbcode_enabled = true
-bbcode_text = "[b]shoutout to:[/b]
+bbcode_text = "[b]If you're seeing this, something with the blog panel code has broken. So here's a fun easter egg. [/b]
+[b]Shoutout to:[/b]
 Pyspy
-charlotte for holding the fort
-everyone on the dev team
- welt for not implementing the zip patch :]]]]]]]]]]]"
-text = "shoutout to:
+Charlotte for holding the fort
+Everyone on the dev team
+The launchers we lost along the way"
+text = "If you're seeing this, something with the blog panel code has broken. So here's a fun easter egg. 
+Shoutout to:
 Pyspy
-charlotte for holding the fort
-everyone on the dev team
- welt for not implementing the zip patch :]]]]]]]]]]]"
+Charlotte for holding the fort
+Everyone on the dev team
+The launchers we lost along the way"
 fit_content_height = true
 
 [node name="PageViewer2" type="ScrollContainer" parent="TabContainer"]

@@ -1,4 +1,6 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://ui_theme.tres" type="Theme" id=1]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends ConfirmationDialog
@@ -31,6 +33,8 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = -600.0
+margin_bottom = -1.0
+theme = ExtResource( 1 )
 window_title = "OOOH THIS IS BAD!"
 resizable = true
 script = SubResource( 1 )
@@ -39,6 +43,6 @@ script = SubResource( 1 )
 visible = false
 margin_left = 8.0
 margin_top = 8.0
-margin_right = 1016.0
-margin_bottom = 564.0
+margin_right = 1192.0
+margin_bottom = 552.0
 text = "placeholder text"
