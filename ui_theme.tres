@@ -5,36 +5,19 @@
 
 [sub_resource type="StyleBoxFlat" id=20]
 bg_color = Color( 0.184314, 0.101961, 0.258824, 1 )
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color( 0.760784, 0.717647, 0.658824, 1 )
 
 [sub_resource type="StyleBoxEmpty" id=21]
 
 [sub_resource type="StyleBoxFlat" id=22]
 bg_color = Color( 0.239216, 0.160784, 0.317647, 1 )
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
 border_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 
 [sub_resource type="StyleBoxFlat" id=11]
 bg_color = Color( 0.239216, 0.160784, 0.317647, 1 )
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
 border_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 
 [sub_resource type="StyleBoxFlat" id=19]
 bg_color = Color( 0.933333, 0.882353, 0.811765, 1 )
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
 border_color = Color( 0.239216, 0.160784, 0.317647, 1 )
 
 [sub_resource type="StyleBoxFlat" id=16]
@@ -53,17 +36,10 @@ bg_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 
 [sub_resource type="StyleBoxFlat" id=17]
 bg_color = Color( 0.239216, 0.160784, 0.317647, 1 )
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
 border_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 
 [sub_resource type="StyleBoxFlat" id=2]
 bg_color = Color( 0.262745, 0.176471, 0.34902, 1 )
-border_width_left = 4
-border_width_right = 4
-border_width_bottom = 4
 border_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 
 [sub_resource type="StyleBoxEmpty" id=14]
@@ -82,9 +58,6 @@ content_margin_bottom = 4.0
 content_margin_left = 8.0
 content_margin_right = 8.0
 bg_color = Color( 0.262745, 0.176471, 0.34902, 1 )
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
 border_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 
 [sub_resource type="StyleBoxFlat" id=5]
@@ -101,14 +74,11 @@ bg_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 
 [sub_resource type="StyleBoxFlat" id=18]
 bg_color = Color( 0.239216, 0.160784, 0.317647, 1 )
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
 border_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 
 [resource]
 default_font = ExtResource( 1 )
+Button/colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 Button/colors/font_color_disabled = Color( 0.654902, 0.654902, 0.654902, 1 )
 Button/colors/font_color_pressed = Color( 0.239216, 0.160784, 0.317647, 1 )
 Button/styles/disabled = SubResource( 20 )
@@ -117,6 +87,7 @@ Button/styles/hover = SubResource( 22 )
 Button/styles/normal = SubResource( 11 )
 Button/styles/pressed = SubResource( 19 )
 HSeparator/styles/separator = SubResource( 16 )
+Label/colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 ProgressBar/styles/bg = SubResource( 12 )
 ProgressBar/styles/fg = SubResource( 13 )
 RichTextLabel/colors/default_color = Color( 0.262745, 0.176471, 0.34902, 1 )
@@ -126,6 +97,8 @@ RichTextLabel/fonts/bold_font = ExtResource( 2 )
 RichTextLabel/fonts/normal_font = ExtResource( 1 )
 RichTextLabel/styles/normal = SubResource( 1 )
 ScrollContainer/styles/bg = SubResource( 17 )
+TabContainer/colors/font_color_bg = Color( 0.933333, 0.882353, 0.811765, 0.705882 )
+TabContainer/colors/font_color_fg = Color( 0.933333, 0.882353, 0.811765, 1 )
 TabContainer/styles/panel = SubResource( 2 )
 TabContainer/styles/tab_bg = SubResource( 14 )
 TabContainer/styles/tab_disabled = SubResource( 15 )

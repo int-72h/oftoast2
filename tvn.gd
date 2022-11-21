@@ -9,6 +9,7 @@ var verif = Crypto.new()
 const TYPE_WRITE = 0
 const TYPE_DELETE = 2
 const TYPE_MKDIR = 1
+signal tvn_ready
 
 func _ready():
 	key_obj.load("res://assets/pubkey.pub",true)
@@ -103,10 +104,8 @@ func get_tag(revision):
 	return revision["tag"]
 
 func set_url(_url):
-	if not("/toast/" in _url):
-		if _url[-1] != '/':
-			_url += '/'
-	_url += "toast/" # basic string formatting
+	if _url[-1] != '/':
+		_url += '/'
 	url = _url
 
 

@@ -1,6 +1,6 @@
 extends Control
 const GDDL = preload("res://gdnative/gddl.gdns")
-onready var tvn = get_node("/root/Control/tvn")
+onready var tvn = get_node("/root/Control/Control/tvn")
 enum {
 	HTML_P,
 	HTML_H1,
@@ -31,15 +31,8 @@ func html2bbcode(pageText):
 
 
 func _ready():
-	connect("thread_done",self,"on_thread_done")
-	var t = Thread.new()
-#	t.start(self,"or_else_it_gets_the_hose_t","https://openfortress.fun/blog/rss/feed") # start 2 threads, one has the timer, the other waits. if the timer expires first can the first thread and error
-#	yield(get_tree().create_timer(5),"timeout")
-#	if t.is_alive():
-#		print("WE'RE HANGING HERE...")
-#		get_node("/root/Control").queue_free()
 	xml_parse(tvn.dl_file_to_mem("https://openfortress.fun/blog/rss/feed",false)) # get rss
-
+	
 signal draw_blog()
 signal thread_done(tab_no)
 var txt_bullet = "[EPICBOOL]"; # used for replacing list bullets in final steps
@@ -155,14 +148,12 @@ func xml_parse(body):
 			if node_type == XMLParser.NODE_TEXT:
 				desc_arr.append(node_data)
 			else:
-				print("description:" + node_name)
 				desc_arr.append(node_name)
 		
 		if(in_title_node == true):
 			if node_type == XMLParser.NODE_TEXT:
 				title_arr.append(node_data)
 			else:
-				print("Title:" + node_name)
 				title_arr.append(node_name)
 	tot_rev = len(title_arr)
 	display_text([rtl1,0,0])
@@ -213,3 +204,4 @@ func gen_tres(image_name):
 func _process(_delta):
 	pass
 	
+

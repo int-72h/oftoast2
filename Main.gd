@@ -1,7 +1,7 @@
 extends Control
 
 const GDDL = preload("res://gdnative/gddl.gdns")
-onready var tvn = get_node("/root/Control/tvn")
+onready var tvn = get_node("/root/Control/Control/tvn")
 onready var steam = get_node("steam")
 var music = preload("res://assets/toast.wav")
 var start = preload("res://assets/start.wav")
@@ -26,15 +26,7 @@ signal verif_fail(path)
 signal thread_done(thread_no)
 var path
 
-func _on_draw_blog():
-	var tween = get_tree().create_tween().set_parallel(true)
-	tween.tween_property($TextureRect,"modulate",Color.transparent,1)
-	yield(get_tree().create_timer(1), "timeout")
-	$TextureRect.hide()
-
-func _ready():
-	$advlabel.rect_position = Vector2(-800,0)
-	$AdvancedPanel.rect_position = Vector2(-800,150)
+func thing():
 	tvn.ua = ua
 	var url = "https://toast1.openfortress.fun/toast/"
 	print(tvn.url)
@@ -46,11 +38,27 @@ func _ready():
 	steam.get_of_path()
 	steam.check_tf2_sdk_exists()
 	path = steam.of_dir
-	installed_revision = tvn.get_installed_revision(path) # see if anythings already where we're downloading
-	print("installed revision: " + str(installed_revision))
+	if path == null:
+		$VBoxContainer/Update.disabled = true
+		$VBoxContainer/Verify.disabled = true
+		installed_revision = -1
+		#do thingy here to get path.
+	else:
+		installed_revision = tvn.get_installed_revision(path) # see if anythings already where we're downloading
+		print("installed revision: " + str(installed_revision))
+		$AdvancedPanel.inst_dir.text = path
 	threads = int(tvn.dl_file_to_mem(url + "/reithreads"))
 	latest_rev = int(tvn.dl_file_to_mem(url + "/revisions/latest"))
-	revisions = tvn.fetch_revisions(installed_revision,latest_rev)
+	$AdvancedPanel.threads.text = str(threads)
+	$AdvancedPanel.target_rev.text = str(latest_rev)
+	revisions = tvn.fetch_revisions(installed_revision,latest_rev) # we precalculate the revision data sneakily
+
+func _ready():
+#	var t = Thread.new()
+#	t.start(self,"thing") # this reduces hitching
+	thing()
+	$advlabel.rect_position = Vector2(-800,0)
+	$AdvancedPanel.rect_position = Vector2(-800,150)
 
 func _on_Verify_pressed():
 	start(true)
@@ -108,6 +116,12 @@ func start(verify=false):
 		error = dir.remove(path + "/.revision")
 		if error != OK:
 			print_debug(error)
+		var file = File.new()
+		error = file.open(path+ '/.dl_started', File.WRITE) # allows us to check for partial dls
+		if error != OK:
+			print_debug(error)
+		file.store_string(str(latest_rev))
+		file.close()
 		$ProgressBar.max_value = len(dl_array)
 		if verify == false:
 			work(dl_array)
@@ -273,3 +287,4 @@ func _on_Advanced_pressed():
 		$AdvancedPanel.visible = !$AdvancedPanel.visible
 		$VBoxContainer/Advanced.disabled = false
 		$advlabel.visible = false
+

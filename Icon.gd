@@ -27,9 +27,10 @@ func stop_tween():
 
 
 func _on_Icon_pressed():
-	get_node("/root/Control/Popup1").popup()
+	get_node("/root/Control/Control/Popup1").popup()
 
 func _on_BlogPanel_draw_blog():
+	return
 	var tween = get_tree().create_tween().set_parallel(true)
 	tween.tween_property(self,"rect_scale",Vector2(1,1),1).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN_OUT)
 

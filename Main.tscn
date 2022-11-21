@@ -50,17 +50,17 @@ margin_left = 24.0
 margin_top = 160.0
 margin_right = 368.0
 margin_bottom = 504.0
-rect_scale = Vector2( 0.1, 0.1 )
 rect_pivot_offset = Vector2( 172, 172 )
 texture_normal = ExtResource( 1 )
 expand = true
 script = ExtResource( 5 )
 
 [node name="Label" type="Label" parent="."]
-margin_left = 64.0
+margin_left = 56.0
 margin_top = 8.0
-margin_right = 370.0
+margin_right = 362.0
 margin_bottom = 116.0
+theme = ExtResource( 6 )
 custom_fonts/font = SubResource( 3 )
 text = "OFTOAST II"
 
@@ -76,6 +76,7 @@ script = ExtResource( 10 )
 margin_left = 408.0
 margin_right = 908.0
 margin_bottom = 108.0
+theme = ExtResource( 6 )
 custom_fonts/font = SubResource( 5 )
 text = "Advanced Options"
 script = ExtResource( 10 )
@@ -195,6 +196,8 @@ texture = ExtResource( 12 )
 [connection signal="file_done" from="." to="." method="_on_Control_file_done"]
 [connection signal="thread_done" from="." to="." method="_on_Control_thread_done"]
 [connection signal="verif_fail" from="." to="." method="_on_Control_verif_fail"]
+[connection signal="tvn_ready" from="tvn" to="." method="on_tvn_load"]
+[connection signal="tvn_ready" from="tvn" to="BlogPanel" method="on_tvn_load"]
 [connection signal="pressed" from="Icon" to="Icon" method="_on_Icon_pressed"]
 [connection signal="pressed" from="VBoxContainer/Update" to="." method="_on_Update_pressed"]
 [connection signal="pressed" from="VBoxContainer/Verify" to="." method="_on_Verify_pressed"]
