@@ -85,8 +85,12 @@ script = ExtResource( 10 )
 volume_db = -80.0
 
 [node name="Popup1" parent="." instance=ExtResource( 4 )]
-visible = false
+margin_left = -32.0
+margin_top = -536.0
+margin_right = -32.0
+margin_bottom = 63.0
 rect_min_size = Vector2( 400, 140 )
+popup_exclusive = true
 
 [node name="SFX" type="AudioStreamPlayer" parent="."]
 
@@ -100,60 +104,69 @@ size_flags_vertical = 3
 
 [node name="Update" type="Button" parent="VBoxContainer"]
 margin_right = 231.0
-margin_bottom = 52.0
+margin_bottom = 50.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_fonts/font = SubResource( 2 )
 text = "Update"
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
-margin_top = 56.0
+margin_top = 54.0
 margin_right = 231.0
-margin_bottom = 60.0
+margin_bottom = 58.0
 custom_styles/separator = SubResource( 4 )
 
-[node name="HSeparator5" type="HSeparator" parent="VBoxContainer"]
-margin_top = 64.0
+[node name="Update2" type="Button" parent="VBoxContainer"]
+margin_top = 62.0
 margin_right = 231.0
-margin_bottom = 68.0
+margin_bottom = 112.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_fonts/font = SubResource( 2 )
+text = "throw error"
+
+[node name="HSeparator5" type="HSeparator" parent="VBoxContainer"]
+margin_top = 116.0
+margin_right = 231.0
+margin_bottom = 120.0
 custom_styles/separator = SubResource( 4 )
 
 [node name="HSeparator4" type="HSeparator" parent="VBoxContainer"]
-margin_top = 72.0
+margin_top = 124.0
 margin_right = 231.0
-margin_bottom = 76.0
+margin_bottom = 128.0
 custom_styles/separator = SubResource( 4 )
 
 [node name="Verify" type="Button" parent="VBoxContainer"]
-margin_top = 80.0
+margin_top = 132.0
 margin_right = 231.0
-margin_bottom = 132.0
+margin_bottom = 182.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_fonts/font = SubResource( 2 )
 text = "Verify"
 
 [node name="HSeparator6" type="HSeparator" parent="VBoxContainer"]
-margin_top = 136.0
+margin_top = 186.0
 margin_right = 231.0
-margin_bottom = 140.0
+margin_bottom = 190.0
 custom_styles/separator = SubResource( 4 )
 
 [node name="HSeparator2" type="HSeparator" parent="VBoxContainer"]
-margin_top = 144.0
+margin_top = 194.0
 margin_right = 231.0
-margin_bottom = 148.0
+margin_bottom = 198.0
 
 [node name="HSeparator3" type="HSeparator" parent="VBoxContainer"]
-margin_top = 152.0
+margin_top = 202.0
 margin_right = 231.0
-margin_bottom = 156.0
+margin_bottom = 206.0
 custom_styles/separator = SubResource( 4 )
 
 [node name="Advanced" type="Button" parent="VBoxContainer"]
-margin_top = 160.0
+margin_top = 210.0
 margin_right = 231.0
-margin_bottom = 212.0
+margin_bottom = 260.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_fonts/font = SubResource( 2 )
@@ -200,6 +213,7 @@ texture = ExtResource( 12 )
 [connection signal="tvn_ready" from="tvn" to="BlogPanel" method="on_tvn_load"]
 [connection signal="pressed" from="Icon" to="Icon" method="_on_Icon_pressed"]
 [connection signal="pressed" from="VBoxContainer/Update" to="." method="_on_Update_pressed"]
+[connection signal="pressed" from="VBoxContainer/Update2" to="." method="_throw_error"]
 [connection signal="pressed" from="VBoxContainer/Verify" to="." method="_on_Verify_pressed"]
 [connection signal="pressed" from="VBoxContainer/Advanced" to="." method="_on_Advanced_pressed"]
 [connection signal="draw_blog" from="BlogPanel" to="." method="_on_draw_blog"]

@@ -24,6 +24,7 @@ func _ready():
 	#yield(get_tree().create_timer(2),"timeout")
 	mainn = main.instance()
 	add_child(mainn)
+	yield(mainn,"draw")
 	var tween = get_tree().create_tween().set_parallel()
 	tween.tween_property($LoaderUI,"modulate",Color.transparent,1.5)
 	tween.tween_property($Control,"modulate",Color.white,1.5)

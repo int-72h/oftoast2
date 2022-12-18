@@ -15,6 +15,7 @@ var downloading
 var done_threads = 0
 var done_threads_arr = []
 var failed_files = []
+var dl_array
 var threads = 8
 var delim = ""
 const ua = "murse/0.3.0" # temporary
@@ -24,12 +25,14 @@ signal all_done
 signal file_done(path)
 signal verif_fail(path)
 signal thread_done(thread_no)
+signal error_handled
 var path
+var url
+var mut = Mutex.new()
 
 func thing():
 	tvn.ua = ua
-	var url = "https://toast1.openfortress.fun/toast/"
-	print(tvn.url)
+	url = "https://toast1.openfortress.fun/toast/"
 	var gd = GDDL.new()
 	if OS.get_name() == "X11":
 		delim = "/"
@@ -47,30 +50,34 @@ func thing():
 		installed_revision = tvn.get_installed_revision(path) # see if anythings already where we're downloading
 		print("installed revision: " + str(installed_revision))
 		$AdvancedPanel.inst_dir.text = path
-	threads = int(tvn.dl_file_to_mem(url + "/reithreads"))
+	#threads = int(tvn.dl_file_to_mem(url + "/reithreads"))
+	threads = 64
 	latest_rev = int(tvn.dl_file_to_mem(url + "/revisions/latest"))
 	$AdvancedPanel.threads.text = str(threads)
 	$AdvancedPanel.target_rev.text = str(latest_rev)
-	revisions = tvn.fetch_revisions(installed_revision,latest_rev) # we precalculate the revision data sneakily
+	revisions = tvn.fetch_revisions(url,-1,12)
+	print("revision len is " + str(len(revisions)))
+	emit_signal("draw")
 
 func _ready():
 #	var t = Thread.new()
 #	t.start(self,"thing") # this reduces hitching
-	thing()
+	call_deferred("thing")
 	$advlabel.rect_position = Vector2(-800,0)
 	$AdvancedPanel.rect_position = Vector2(-800,150)
 
 func _on_Verify_pressed():
 	start(true)
-
+	
 func _on_Update_pressed():
 	start()
 
 
-func _on_Control_file_done(_eggs):
+func _on_Control_file_done():
 	$ProgressBar.value +=1
 	
 func start(verify=false):
+	dl_array = []
 	$ProgressBar.show()
 	$Icon.spin = true
 	$Icon.start_tween()
@@ -81,59 +88,60 @@ func start(verify=false):
 	$VBoxContainer/Update.disabled = true
 	$VBoxContainer/Verify.disabled = true
 	$ProgressBar.show()
+	var dir = Directory.new()
+	var error
 #	if not("open_fortress" in path):
 #		if path[-1] != delim:
 #			path += delim
 #		path += "open_fortress" # this is left untill we have a path input box.
-	if installed_revision == -1 and verify == false: # the zip thing
+	if tvn.check_partial_download(path) != tvn.FAIL:
+		verify = true
+	if installed_revision == -11 and verify == false: # the zip thing
 		var t = Thread.new()
-		arr_of_threads.append(t)
-		arr_of_threads[0].start(self,"_dozip",["",path]) ## no url as it hasn't been implemented serverside yet
+		#arr_of_threads.append(t)
+		#arr_of_threads[0].start(self,"_dozip",["",path]) ## no url as it hasn't been implemented serverside yet
 	else:
-		#installed_revision = -1
+		installed_revision = -1
 		if verify:
 			installed_revision = -1
 		var changes = tvn.replay_changes(revisions)
 		var writes = filter(tvn.TYPE_WRITE,changes)
-		var dl_array = []
 		for x in writes:
-			dl_array.append([tvn.url + "objects/" + x["object"], path + delim + x["path"],x["hash"]])
+			dl_array.append([url + "objects/" + x["object"], path + delim + x["path"],x["hash"]])
 		for x in filter(tvn.TYPE_DELETE,changes):
-			var error
-			var dir = Directory.new()
+			dir = Directory.new()
 			if dir.file_exists(path + delim + x["path"]):
 				error = dir.remove(path + delim + x["path"])
 				if error != OK:
 					print_debug(error)
 		for x in filter(tvn.TYPE_MKDIR,changes):
-			var error
-			var dir = Directory.new()
+			dir = Directory.new()
 			error = dir.make_dir_recursive(path +delim+ x["path"])
 			if error != OK and (error != 20):
-				print_debug(error)
-		var error
-		var dir = Directory.new()
+				print_debug("CRITICAL: can't write ")
 		error = dir.remove(path + "/.revision")
 		if error != OK:
-			print_debug(error)
+			print_debug("no .revision, ok....")
 		var file = File.new()
 		error = file.open(path+ '/.dl_started', File.WRITE) # allows us to check for partial dls
 		if error != OK:
-			print_debug(error)
+			error_handler("can't write dl_started file... this is a non-issue really, but could be a sign for worse things. Press OK to continue.")
+			yield(self,"error_handled")
 		file.store_string(str(latest_rev))
 		file.close()
 		$ProgressBar.max_value = len(dl_array)
 		if verify == false:
-			work(dl_array)
+			work()
 			pass
 		else:
-			verify(dl_array)
+			verify()
 			pass
 	yield(self,"all_done")
 	var file = File.new()
-	var error = file.open(path+ '/.revision', File.WRITE)
+	error = file.open(path+ '/.revision', File.WRITE)
 	if error != OK:
-		print_debug(error)
+		error_handler("Failed to write .revision file: the game may launch, however it won't update without a complete reinstall.\nThis could be due to a permissions error, running out of space, or something else.")
+		yield(self,"error_handled")
 	file.store_string(str(latest_rev))
 	file.close()
 	$Icon.stop_tween()
@@ -150,19 +158,34 @@ func _dozip(arr):
 	var lpath = arr[1]
 	var dl_object = GDDL.new()
 	var ziploc = ProjectSettings.globalize_path("user://latest.zip")
-	if not tvn.download_file(url,ziploc):
-		print("uh oh.") # do more error handling
+	var error = tvn.download_file(url,ziploc)
+	if error != tvn.OK:
+		error_handler("failed to download zip: " + error)
+		yield(self,"error_handled")
 	var z = dl_object.unzip(ziploc,lpath)
 	if z != "0":
-		print("uh oh.")
+		error_handler("failed to unzip!")
+		yield(self,"error_handled")
 	var f = Directory.new()
 	f.remove(ziploc) ## delete zipx
 	done_threads_arr.append(0)
 
 func _work(arr):
-	var arr_of_files = arr[0]
-	var thread_no = arr[1]
-	for dl in arr_of_files:
+	var thread_no = arr
+	print("hello from thread " + str(thread_no))
+	var all_dls_done = false
+	while !all_dls_done:
+		mut.lock()
+		print("we locked the mutex...")
+		print(len(dl_array))
+		if len(dl_array) == 0:
+			mut.unlock()
+			all_dls_done = true
+			break
+		var dl = dl_array.pop_back()
+		mut.unlock()
+		print("and we unlocked it!")
+		print(dl)
 		var file_downloaded = false
 		while file_downloaded == false:
 			var dl_object = GDDL.new()
@@ -170,13 +193,16 @@ func _work(arr):
 			var path = dl[1]
 			var url = dl[0]
 			if not dl_object.download_file(url,path):
+				mut.lock()
 				print("uh oh.")
-				print_debug(dl_object.get_error()) # we really need to handle these properly.
-				emit_signal("verif_fail",path)
+				error_handler(dl_object.get_error() + " Path: " + path + "\n url: " + url)
+				yield(self,"error_handled")
+				mut.unlock()
+				print("we've unlocked the mutex at least... thread "+ str(thread_no))
 			else:
-				emit_signal("file_done",path)
+				emit_signal("file_done")
 				file_downloaded = true
-	print("whole thread done!")
+	print("And we're done!")
 	done_threads_arr.append(thread_no)
 
 func chunk(arr, size):
@@ -200,33 +226,31 @@ static func filter(type, candidate_array):
 	return filtered_array
 
 
-func work(arr):
-	print(len(arr))
-	var z
-	print(threads)
+func work():
 	if threads == 1:
-		_work([arr,0])
-	elif len(arr) > threads:
-		z = chunk(arr,int(ceil(len(arr) / threads)))
+		var t = Thread.new()
+		arr_of_threads.append(t)
+		arr_of_threads[0].start(self,"_work",0)
+		#_work(0)
+	elif len(dl_array) > threads:
 		for x in range(0,threads):
 			var t = Thread.new()
 			arr_of_threads.append(t)
-			arr_of_threads[x].start(self,"_work",[z[x],x])
+			arr_of_threads[x].start(self,"_work",x)
 		
 	else:
-		threads = len(arr)
-		for x in range(0,len(arr)):
+		for x in range(0,len(dl_array)):
 			var t = Thread.new()
 			arr_of_threads.append(t)
-			arr_of_threads[x].start(self,"_work",[[arr[x]],x])
+			arr_of_threads[x].start(self,"_work",x)
 	print_debug("threads started")
 	
-func verify(dl_array):
+func verify():
 	var t = Thread.new()
-	t.start(self,"_verify",dl_array)
+	t.start(self,"_verify")
 
 
-func _verify(dl_array):
+func _verify():
 	var redl_array = []
 	var file = File.new()
 	for dl in dl_array:
@@ -240,11 +264,12 @@ func _verify(dl_array):
 	if redl_array == []:
 		emit_signal("all_done")
 	else:
-		work(redl_array)
+		dl_array = redl_array
+		work()
 
 
 func _process(delta):
-	if done_threads_arr != []:
+	if len(done_threads_arr) > 0:
 		for t in done_threads_arr:
 			arr_of_threads[t].wait_to_finish()
 			done_threads += 1
@@ -253,7 +278,16 @@ func _process(delta):
 	if done_threads == threads:
 		emit_signal("all_done")
 
-
+func error_handler(error):
+	var dunn = preload("res://assets/this-is-bad.wav")
+	$SFX.stream = dunn
+	$SFX.play()
+	$Popup1.set("dialog_text",str(error))
+	$Popup1.popup()
+	yield($Popup1,"pressed")
+	var val = $Popup1.val
+	print(val) 
+	emit_signal("error_handled")
 
 
 func _on_Advanced_pressed():
@@ -288,3 +322,7 @@ func _on_Advanced_pressed():
 		$VBoxContainer/Advanced.disabled = false
 		$advlabel.visible = false
 
+func _throw_error(): # throws an error
+	error_handler("ERROR TEST... LOVELY")
+	yield(self,"error_handled")
+	print("this should print after the error has been handled")

@@ -24,7 +24,7 @@ config/name="OFTOAST II"
 config/description="THAT'S RIGHT OFTOAST II 2 BABY"
 run/main_scene="res://loader.tscn"
 boot_splash/image="res://unknown.png"
-config/icon="res://icon.png"
+config/icon="res://assets/toast.png"
 
 [display]
 

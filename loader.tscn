@@ -62,13 +62,15 @@ custom_fonts/font = ExtResource( 3 )
 text = "OFtoast"
 
 [node name="Label3" type="Label" parent="LoaderUI"]
-margin_left = 750.0
-margin_top = 253.0
-margin_right = 1154.0
-margin_bottom = 358.0
+margin_left = 618.0
+margin_top = 258.0
+margin_right = 1178.0
+margin_bottom = 437.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 custom_fonts/font = SubResource( 2 )
-text = "powered by tvn"
+text = "powered by tvn
+A toastware product"
+align = 2
 
 [node name="Label4" type="Label" parent="LoaderUI"]
 margin_left = 16.0
@@ -87,11 +89,11 @@ Bryson"
 [node name="Label5" type="Label" parent="LoaderUI"]
 margin_left = 8.0
 margin_top = 944.0
-margin_right = 1397.0
-margin_bottom = 1343.0
+margin_right = 613.0
+margin_bottom = 1052.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 custom_fonts/font = SubResource( 7 )
-text = "(c) intcoms 2022.
+text = "(c) Toastware 2023.
 This product is FREE SOFTWARE, you can distribute/modify it according to the 
 terms of the MIT License. See about page for more info."
 

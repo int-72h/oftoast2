@@ -9,6 +9,8 @@ var verif = Crypto.new()
 const TYPE_WRITE = 0
 const TYPE_DELETE = 2
 const TYPE_MKDIR = 1
+const OK = 0
+const FAIL = 1
 signal tvn_ready
 
 func _ready():
@@ -52,18 +54,27 @@ func get_installed_revision(dir):
 	var file = File.new() 
 	var error = file.open(dir + '/.revision', File.READ)
 	if error != OK:
-		return -1
+		return FAIL
 	else:
 		return int(file.get_as_text())
+
+func check_partial_download(dir):
+	var file = File.new() 
+	var error = file.open("/.dl_started", File.READ)
+	if error != OK:
+		return FAIL
+	else:
+		return int(file.get_as_text())
+
 
 func download_file(url,path):
 	var data = GDDL.new()
 	data.set_agent(ua)
 	data.download_file(url,path)
 	if not data:
-		error_handler(data.get_error())
+		return data.get_error()
 	else:
-		return data
+		return OK
 
 
 func dl_file_to_mem(url,bin=false):
@@ -74,20 +85,12 @@ func dl_file_to_mem(url,bin=false):
 		if ret:
 			return ret
 		else:
-			error_handler(data.get_error())
+			return data.get_error()
 	else:
 		var z = data.download_to_array(url)
 		if not z:
-			print(data.get_error())
+			return data.get_error()
 		return z
-	
-func error_handler(error):
-	var dunn = preload("res://assets/this-is-bad.wav")
-	get_node("/root/Control/SFX").stream = dunn
-	get_node("/root/Control/SFX").play()
-	#get_node("/root/Control/Popup1/Label2").set("dialog_text",str(error))
-	#get_node("/root/Control/Popup1").popup()
-	return yield(get_node("/root/Control/Popup1").get_val(str(error)),"completed")
 	
 	
 
@@ -109,14 +112,14 @@ func set_url(_url):
 	url = _url
 
 
-func fetch_revisions(first, last):
+func fetch_revisions(url,first, last):
 	for x in range(first+1,last+1):
 		if not (x<0):
 			var error = false
 			var dl = GDDL.new()
 			dl.set_agent(ua)
-			var rev = dl_file_to_mem("revisions/" + str(x))
-			var sig = dl_file_to_mem("revisions/" + str(x) + ".sig",true)
+			var rev = dl_file_to_mem(url + "revisions/" + str(x))
+			var sig = dl_file_to_mem(url + "revisions/" + str(x) + ".sig",true)
 			var verified = verif.verify(HashingContext.HASH_SHA256, rev.sha256_buffer(), sig, key_obj)
 			var rev_json = JSON.parse(rev) ## handle the error here
 			#if rev_json.result["revision"] != x:
@@ -124,4 +127,5 @@ func fetch_revisions(first, last):
 			if (error == true) or (rev_json.error != OK):
 				return -1
 			revisions.append(rev_json.result) # ["changes"]
+			print("fetched revision " + str(x))
 	return revisions
