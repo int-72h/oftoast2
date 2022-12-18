@@ -1,5 +1,5 @@
 extends Control
-const GDDL = preload("res://gdnative/gdnative/gddl.gdns")
+const GDDL = preload("res://gdnative/gddl.gdns")
 const main = preload("res://Main.tscn")
 var gd = GDDL.new()
 var mainn
