@@ -7,8 +7,6 @@ var music = preload("res://assets/toast.wav")
 var start = preload("res://assets/start.wav")
 var done = preload("res://assets/done.wav")
 const version = "0.0.1"
-func _on_Icon_pressed():
-	$Popup1.popup_centered(Vector2(50,50))
 var revisions = []
 var arr_of_threads = []
 var downloading
@@ -29,6 +27,9 @@ signal error_handled
 var path
 var url
 var mut = Mutex.new()
+var error_result
+var error_input
+var target_revision
 
 func thing():
 	tvn.ua = ua
@@ -41,6 +42,7 @@ func thing():
 	steam.get_of_path()
 	steam.check_tf2_sdk_exists()
 	path = steam.of_dir
+	print(path)
 	if path == null:
 		$VBoxContainer/Update.disabled = true
 		$VBoxContainer/Verify.disabled = true
@@ -50,10 +52,10 @@ func thing():
 		installed_revision = tvn.get_installed_revision(path) # see if anythings already where we're downloading
 		print("installed revision: " + str(installed_revision))
 		$AdvancedPanel.inst_dir.text = path
-	#threads = int(tvn.dl_file_to_mem(url + "/reithreads"))
-	threads = 64
+	threads = int(tvn.dl_file_to_mem(url + "/reithreads"))
 	latest_rev = int(tvn.dl_file_to_mem(url + "/revisions/latest"))
 	$AdvancedPanel.threads.text = str(threads)
+	target_revision = latest_rev
 	$AdvancedPanel.target_rev.text = str(latest_rev)
 	revisions = tvn.fetch_revisions(url,-1,12)
 	print("revision len is " + str(len(revisions)))
@@ -90,10 +92,6 @@ func start(verify=false):
 	$ProgressBar.show()
 	var dir = Directory.new()
 	var error
-#	if not("open_fortress" in path):
-#		if path[-1] != delim:
-#			path += delim
-#		path += "open_fortress" # this is left untill we have a path input box.
 	if tvn.check_partial_download(path) != tvn.FAIL:
 		verify = true
 	if installed_revision == -11 and verify == false: # the zip thing
@@ -119,7 +117,7 @@ func start(verify=false):
 			error = dir.make_dir_recursive(path +delim+ x["path"])
 			if error != OK and (error != 20):
 				print_debug("CRITICAL: can't write ")
-		error = dir.remove(path + "/.revision")
+		error = dir.remove(path + "/.revision") # godot file/dir api consistently uses unix path seperators - GDNATIVE API DOESN'T!
 		if error != OK:
 			print_debug("no .revision, ok....")
 		var file = File.new()
@@ -176,16 +174,12 @@ func _work(arr):
 	var all_dls_done = false
 	while !all_dls_done:
 		mut.lock()
-		print("we locked the mutex...")
-		print(len(dl_array))
 		if len(dl_array) == 0:
 			mut.unlock()
 			all_dls_done = true
 			break
 		var dl = dl_array.pop_back()
 		mut.unlock()
-		print("and we unlocked it!")
-		print(dl)
 		var file_downloaded = false
 		while file_downloaded == false:
 			var dl_object = GDDL.new()
@@ -205,20 +199,8 @@ func _work(arr):
 	print("And we're done!")
 	done_threads_arr.append(thread_no)
 
-func chunk(arr, size):
-	var ret = []
-	var i = 0
-	var j = -1
-	for el in arr:
-		if i % size == 0:
-			ret.push_back([])
-			j += 1;
-		ret[j].push_back(el)
-		i += 1
-	return ret
 
-
-static func filter(type, candidate_array):
+static func filter(type, candidate_array): # used for tvn shenanigans
 	var filtered_array := []
 	for candidate_value in candidate_array:
 		if candidate_value["type"] == type:
@@ -227,22 +209,10 @@ static func filter(type, candidate_array):
 
 
 func work():
-	if threads == 1:
+	for x in range(0,threads):
 		var t = Thread.new()
 		arr_of_threads.append(t)
-		arr_of_threads[0].start(self,"_work",0)
-		#_work(0)
-	elif len(dl_array) > threads:
-		for x in range(0,threads):
-			var t = Thread.new()
-			arr_of_threads.append(t)
-			arr_of_threads[x].start(self,"_work",x)
-		
-	else:
-		for x in range(0,len(dl_array)):
-			var t = Thread.new()
-			arr_of_threads.append(t)
-			arr_of_threads[x].start(self,"_work",x)
+		arr_of_threads[x].start(self,"_work",x)
 	print_debug("threads started")
 	
 func verify():
@@ -278,7 +248,7 @@ func _process(delta):
 	if done_threads == threads:
 		emit_signal("all_done")
 
-func error_handler(error):
+func error_handler(error,input=false):
 	var dunn = preload("res://assets/this-is-bad.wav")
 	$SFX.stream = dunn
 	$SFX.play()
@@ -286,7 +256,8 @@ func error_handler(error):
 	$Popup1.popup()
 	yield($Popup1,"pressed")
 	var val = $Popup1.val
-	print(val) 
+	if input:
+		error_input = $Popup1/LineEdit.text
 	emit_signal("error_handled")
 
 

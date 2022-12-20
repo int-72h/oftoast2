@@ -167,7 +167,7 @@ margin_bottom = 128.0
 [node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/MaxDLSpeed"]
 margin_right = 743.0
 margin_bottom = 29.0
-text = "Maximum Download Speed"
+text = "Maximum Download Speed (MB/s)"
 
 [node name="Text" type="LineEdit" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/MaxDLSpeed"]
 margin_top = 33.0
@@ -222,3 +222,9 @@ text = "this is where the path GOES"
 margin_top = 1011.0
 margin_right = 755.0
 margin_bottom = 1015.0
+
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/VersionContainer/Revision/Text" to="." method="_on_revision_changed"]
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Threads/Text" to="." method="_on_threads_changed"]
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/MaxDLSpeed/Text" to="." method="_on_maxdl_changed"]
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/InstallDir/Text" to="." method="_on_installdir_changed"]
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Mirrors/Text" to="." method="_on_mirrors_changed"]

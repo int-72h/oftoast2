@@ -1,10 +1,12 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://loader.gd" type="Script" id=1]
 [ext_resource path="res://assets/toast.png" type="Texture" id=2]
 [ext_resource path="res://assets/mainfont.tres" type="DynamicFont" id=3]
 [ext_resource path="res://Oswald-Medium.ttf" type="DynamicFontData" id=4]
 [ext_resource path="res://toast.gd" type="Script" id=5]
+[ext_resource path="res://Popup.tscn" type="PackedScene" id=6]
+[ext_resource path="res://assets/slateware-of.png" type="Texture" id=7]
 
 [sub_resource type="DynamicFontData" id=5]
 font_path = "res://assets/Staatliches-Regular.ttf"
@@ -52,6 +54,14 @@ script = ExtResource( 5 )
 margin_right = 40.0
 margin_bottom = 40.0
 
+[node name="TextureRect2" type="TextureRect" parent="LoaderUI"]
+margin_left = 8.0
+margin_top = 941.0
+margin_right = 135.0
+margin_bottom = 1068.0
+texture = ExtResource( 7 )
+expand = true
+
 [node name="Label" type="Label" parent="LoaderUI"]
 margin_left = 432.0
 margin_top = -8.0
@@ -62,21 +72,26 @@ custom_fonts/font = ExtResource( 3 )
 text = "OFtoast"
 
 [node name="Label3" type="Label" parent="LoaderUI"]
-margin_left = 618.0
-margin_top = 258.0
-margin_right = 1178.0
-margin_bottom = 437.0
+margin_left = 496.0
+margin_top = 257.0
+margin_right = 1175.0
+margin_bottom = 1073.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 custom_fonts/font = SubResource( 2 )
-text = "powered by tvn
-A toastware product"
+text = "A toastware product
+powered by tvn
+
+
+
+
+codename \"pinnacle\""
 align = 2
 
 [node name="Label4" type="Label" parent="LoaderUI"]
-margin_left = 16.0
-margin_top = 576.0
-margin_right = 432.0
-margin_bottom = 975.0
+margin_left = 13.0
+margin_top = 577.0
+margin_right = 429.0
+margin_bottom = 976.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 custom_fonts/font = SubResource( 4 )
 text = "Credits:
@@ -87,21 +102,26 @@ pont (UI Design)
 Bryson"
 
 [node name="Label5" type="Label" parent="LoaderUI"]
-margin_left = 8.0
-margin_top = 944.0
-margin_right = 613.0
-margin_bottom = 1052.0
+margin_left = 153.0
+margin_top = 958.0
+margin_right = 758.0
+margin_bottom = 1066.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 custom_fonts/font = SubResource( 7 )
 text = "(c) Toastware 2023.
-This product is FREE SOFTWARE, you can distribute/modify it according to the 
-terms of the MIT License. See about page for more info."
+This product is FREE SOFTWARE, you can distribute/modify it according
+to the terms of the MIT License. See about page for more info."
 
 [node name="Label2" type="Label" parent="LoaderUI"]
-margin_left = 728.0
-margin_top = 648.0
-margin_right = 1184.0
-margin_bottom = 1148.0
+margin_left = 734.0
+margin_top = 371.0
+margin_right = 1190.0
+margin_bottom = 871.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 custom_fonts/font = SubResource( 6 )
 text = "2.0"
+
+[node name="SFX" type="AudioStreamPlayer" parent="."]
+
+[node name="Popup1" parent="." instance=ExtResource( 6 )]
+visible = false

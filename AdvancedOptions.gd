@@ -18,7 +18,29 @@ func _ready():
 
 
 
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
+
+
+func _on_revision_changed(new_text):
+	print(new_text)
+
+
+func _on_threads_changed(new_text):
+	print(new_text)
+
+
+func _on_maxdl_changed(new_text):
+	print(new_text)
+
+
+func _on_installdir_changed(new_text):
+	print(new_text)
+	if new_text[-1] == get_node("/root/Control/Control").delim:
+		new_text.erase(new_text.length()-1,1)
+		inst_dir.text = new_text
+	get_node("/root/Control/Control").path = inst_dir.text
+
+func _on_mirrors_changed():
+	print(mirrors.text)

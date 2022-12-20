@@ -1,31 +1,7 @@
 [gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://ui_theme.tres" type="Theme" id=1]
-
-[sub_resource type="GDScript" id=1]
-script/source = "extends ConfirmationDialog
-
-var val
-signal pressed
-func _ready():
-	get_cancel().connect(\"pressed\", self, \"cancel\")
-	get_ok().connect(\"pressed\",self,\"ok\")
-
-func get_val(text):
-	dialog_text = text
-	popup()
-	yield(self,\"pressed\")
-	return val # 0 = retry, 1=ok
-
-
-func cancel():
-	val = 0
-	emit_signal(\"pressed\")
-	
-func ok():
-	val = 1
-	emit_signal(\"pressed\")
-"
+[ext_resource path="res://Popup.gd" type="Script" id=2]
 
 [node name="Popup1" type="ConfirmationDialog"]
 anchor_top = 1.0
@@ -36,12 +12,11 @@ margin_bottom = -1.0
 theme = ExtResource( 1 )
 window_title = "OOOH THIS IS BAD!"
 resizable = true
-script = SubResource( 1 )
+script = ExtResource( 2 )
 
-[node name="Label2" type="Label" parent="."]
+[node name="LineEdit" type="LineEdit" parent="."]
 visible = false
-margin_left = 8.0
-margin_top = 8.0
-margin_right = 1192.0
-margin_bottom = 554.0
-text = "placeholder text"
+margin_left = 18.0
+margin_top = 42.0
+margin_right = 1160.0
+margin_bottom = 81.0
