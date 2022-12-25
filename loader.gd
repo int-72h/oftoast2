@@ -31,11 +31,11 @@ func _ready():
 	yield(mainn,"draw")
 	var tween = get_tree().create_tween().set_parallel()
 	tween.tween_property($LoaderUI,"modulate",Color.transparent,1.5)
-	tween.tween_property($Control,"modulate",Color.white,1.5)
-	$Control/Icon.visible = false
+	#tween.tween_property($Control,"modulate",Color.white,1.5)
+	#$Control/Icon.visible = false
 	$TextureRect.call("switch")
 	yield(get_tree().create_timer(1.5),"timeout")
-	$Control/Icon.visible = true
+	#$Control/Icon.visible = true
 	#yield(self,"done_loading")
 	#pass
 

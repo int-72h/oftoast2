@@ -24,6 +24,8 @@ signal file_done(path)
 signal verif_fail(path)
 signal thread_done(thread_no)
 signal error_handled
+signal start_spin
+signal stop_spin
 var path
 var url
 var mut = Mutex.new()
@@ -52,13 +54,13 @@ func thing():
 		installed_revision = tvn.get_installed_revision(path) # see if anythings already where we're downloading
 		print("installed revision: " + str(installed_revision))
 		$AdvancedPanel.inst_dir.text = path
-	threads = int(tvn.dl_file_to_mem(url + "/reithreads"))
-	latest_rev = int(tvn.dl_file_to_mem(url + "/revisions/latest"))
-	$AdvancedPanel.threads.text = str(threads)
+	#threads = int(tvn.dl_file_to_mem(url + "/reithreads"))
+	#latest_rev = int(tvn.dl_file_to_mem(url + "/revisions/latest"))
+	#$AdvancedPanel.threads.text = str(threads)
 	target_revision = latest_rev
-	$AdvancedPanel.target_rev.text = str(latest_rev)
-	revisions = tvn.fetch_revisions(url,-1,12)
-	print("revision len is " + str(len(revisions)))
+	#$AdvancedPanel.target_rev.text = str(latest_rev)
+	#revisions = tvn.fetch_revisions(url,-1,12)
+	#print("revision len is " + str(len(revisions)))
 	emit_signal("draw")
 
 func _ready():
@@ -81,7 +83,6 @@ func _on_Control_file_done():
 func start(verify=false):
 	dl_array = []
 	$ProgressBar.show()
-	$Icon.spin = true
 	$Icon.start_tween()
 	$Music.stream = music
 	$SFX.stream = start
@@ -269,13 +270,13 @@ func _on_Advanced_pressed():
 		$AdvancedPanel.visible = true
 		$advlabel.visible = true
 		$VBoxContainer/Advanced.disabled = true
-		$AdvancedPanel.rect_position = Vector2(-800,150)
-		$advlabel.rect_position = Vector2(-700,150)
+		$AdvancedPanel.rect_position = Vector2(-900,150)
+		$advlabel.rect_position = Vector2(-900,150)
 		var tween = get_tree().create_tween().set_parallel(true)
-		tween.tween_property($AdvancedPanel,"rect_position",Vector2(400,150),time).set_trans(transition).set_ease(easeing)
+		tween.tween_property($AdvancedPanel,"rect_position",Vector2(552,150),time).set_trans(transition).set_ease(easeing)
 		#yield(get_tree().create_timer(0.1),"timeout")
-		tween.tween_property($advlabel,"rect_position",Vector2(408,0),time).set_trans(transition).set_ease(easeing)
-		tween.tween_property($BlogPanel/TabContainer,"modulate",Color.transparent,time).set_trans(transition).set_ease(easeing)
+		tween.tween_property($advlabel,"rect_position",Vector2(552,0),time).set_trans(transition).set_ease(easeing)
+		tween.tween_property($BlogPanel,"modulate",Color.transparent,time).set_trans(transition).set_ease(easeing)
 		tween.tween_property($templabel,"modulate",Color.transparent,time).set_trans(transition).set_ease(easeing)
 		yield(get_tree().create_timer(time),"timeout")
 		$BlogPanel.visible = !$BlogPanel.visible
@@ -284,9 +285,9 @@ func _on_Advanced_pressed():
 		$BlogPanel.visible = true
 		$VBoxContainer/Advanced.disabled = true
 		var tween = get_tree().create_tween().set_parallel(true)
-		tween.tween_property($AdvancedPanel,"rect_position",Vector2(-800,150),time).set_trans(transition).set_ease(easeing)
-		tween.tween_property($advlabel,"rect_position",Vector2(-800,150),time).set_trans(transition).set_ease(easeing)
-		tween.tween_property($BlogPanel/TabContainer,"modulate",Color.white,time).set_trans(transition).set_ease(easeing)
+		tween.tween_property($AdvancedPanel,"rect_position",Vector2(-900,150),time).set_trans(transition).set_ease(easeing)
+		tween.tween_property($advlabel,"rect_position",Vector2(-900,150),time).set_trans(transition).set_ease(easeing)
+		tween.tween_property($BlogPanel,"modulate",Color.white,time).set_trans(transition).set_ease(easeing)
 		tween.tween_property($templabel,"modulate",Color.white,time).set_trans(transition).set_ease(easeing)
 		yield(get_tree().create_timer(0.5),"timeout")
 		$AdvancedPanel.visible = !$AdvancedPanel.visible

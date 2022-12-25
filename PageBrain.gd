@@ -7,9 +7,9 @@ enum {
 	HTML_LI
 	}
 
-const THUMBNAIL_HEIGHT = 96
-
-
+const THUMBNAIL_HEIGHT = 150
+const BAR_WIDTH = 872
+const THUMB_WIDTH = floor(BAR_WIDTH/3)-20
 func html2bbcode(pageText):
 	pageText = pageText.replace("<strong>", "<b>");
 	pageText = pageText.replace("</strong>", "</b>");
@@ -42,10 +42,10 @@ var tot_rev
 var done_drawing = false
 var gddl = GDDL.new()
 var tmp
-onready var rtl1 = $TabContainer/PageViewer/RichTextLabel
-onready var rtl2 = $TabContainer/PageViewer2/RichTextLabel
-onready var rtl3 = $TabContainer/PageViewer3/RichTextLabel
-onready var tab = $TabContainer
+onready var rtl1 = $PageViewer/RichTextLabel
+onready var rtl2 = $PageViewer2/RichTextLabel
+onready var rtl3 = $PageViewer3/RichTextLabel
+onready var tab = self
 func display_text(arr):
 	var rtl = arr[0]
 	var offset = arr[1]
@@ -114,7 +114,9 @@ func display_text(arr):
 		tab.set_tab_title(tab_no,"")
 		pass
 	else:
-		tab.set_tab_title(tab_no,html2bbcode(titleText))
+		icon = genthumbnail("toast")
+		tab.set_tab_icon(tab_no,icon)
+		tab.set_tab_title(tab_no,"")
 	for i in bb_parsed:
 		rtl.append_bbcode(i)
 		
@@ -172,18 +174,23 @@ func genthumbnail(name):
 	var doresize = true
 	if file.file_exists(thumbnail_path):
 		print("thumbnail exists, gettining")
-		path = thumbnail_path
-		doresize = true
+		#path = thumbnail_path
 	var image_t = Image.new()
 	var error = image_t.load(path)
 	if error != OK:
 		push_error("Couldn't load the image.")
 	var texture = ImageTexture.new();
-	if doresize:
-		var aspect_ratio = float(image_t.get_width()) / float(image_t.get_height())
-		image_t.resize(aspect_ratio*THUMBNAIL_HEIGHT,THUMBNAIL_HEIGHT)
-		image_t.save_png(thumbnail_path)
-	texture.create_from_image(image_t)
+	var new_image = Image.new()
+	if doresize: # we need to pad out the images to fit the width.
+		var aspect_ratio = float(image_t.get_width()) / float(image_t.get_height()) 
+		image_t.resize(aspect_ratio*THUMBNAIL_HEIGHT,THUMBNAIL_HEIGHT,4)
+		var image_width = image_t.get_width()
+		new_image.create(THUMB_WIDTH,THUMBNAIL_HEIGHT,false,Image.FORMAT_RGBA8)
+		var padding_offset = -floor((image_width - THUMB_WIDTH )/2) # dunno why its minus, but this is the offset it needs to be be so it's in the centre of the new image.
+		var image_rect = Rect2(Vector2(0,0),Vector2(image_width,THUMBNAIL_HEIGHT))
+		new_image.blit_rect(image_t,image_rect,Vector2(padding_offset,0)) # blit the thumbnail into the new canvas
+		new_image.save_png(thumbnail_path)
+	texture.create_from_image(new_image)
 	return texture
 
 func gen_tres(image_name):
