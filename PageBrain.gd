@@ -1,22 +1,21 @@
 extends Control
 const GDDL = preload("res://gdnative/gddl.gdns")
-onready var tvn = get_node("/root/Control/Control/tvn")
 enum {
 	HTML_P,
 	HTML_H1,
 	HTML_LI
 	}
 
-const THUMBNAIL_HEIGHT = 96
-
-
+const THUMBNAIL_HEIGHT = 150
+const BAR_WIDTH = 872
+const THUMB_WIDTH = floor(BAR_WIDTH/3)-20
 func html2bbcode(pageText):
 	pageText = pageText.replace("<strong>", "<b>");
 	pageText = pageText.replace("</strong>", "</b>");
 	pageText = pageText.replace("<b>", "[b]");
 	pageText = pageText.replace("</b>", "[/b]");
 	pageText = pageText.replace("<em>", "[i]");
-	pageText = pageText.replace("</em>", "[/i]");	
+	pageText = pageText.replace("</em>", "[/i]");
 	pageText = pageText.replace("<h1>", "[font=res://fonts/font_header.tres]");
 	pageText = pageText.replace("</h1>", "[/font][LINEEND]");
 	pageText = pageText.replace("<p>", "");
@@ -27,14 +26,24 @@ func html2bbcode(pageText):
 	pageText = pageText.replace("</li>", "");
 	pageText = pageText.replace("&amp;", "&");
 	pageText = pageText.replace("]]>", "");
+	pageText = pageText.replace("]]>", "");
+	pageText = pageText.replace("<ins>", "");
+	pageText = pageText.replace("</ins>", "");
+	var z = pageText.find("<a")
+	while z != -1:
+		var tmp = pageText.substr(z)
+		var tag = pageText.substr(z,tmp.find(">")+1)
+		var url = tag.substr(tag.find("href=\"")+6,tag.find_last("\""))
+		pageText = pageText.replace(tag,"[url=" + url +"]")
+		z = pageText.find("<a")
+	pageText = pageText.replace("</a>","[/url]")
 	return pageText
 
 
 func _ready():
-	xml_parse(tvn.dl_file_to_mem("https://openfortress.fun/blog/rss/feed",false)) # get rss
+	var dl = GDDL.new()
+	xml_parse(dl.download_to_string("https://openfortress.fun/blog/rss/feed"))
 	
-signal draw_blog()
-signal thread_done(tab_no)
 var txt_bullet = "[EPICBOOL]"; # used for replacing list bullets in final steps
 var title_arr = []
 var desc_arr = []
@@ -42,16 +51,16 @@ var tot_rev
 var done_drawing = false
 var gddl = GDDL.new()
 var tmp
-onready var rtl1 = $TabContainer/PageViewer/RichTextLabel
-onready var rtl2 = $TabContainer/PageViewer2/RichTextLabel
-onready var rtl3 = $TabContainer/PageViewer3/RichTextLabel
-onready var tab = $TabContainer
+onready var rtl1 = $PageViewer/RichTextLabel
+onready var rtl2 = $PageViewer2/RichTextLabel
+onready var rtl3 = $PageViewer3/RichTextLabel
+onready var tab = self
 func display_text(arr):
 	var rtl = arr[0]
 	var offset = arr[1]
 	var tab_no = arr[2]
 	print("hello from tab" + str(tab_no))
-	var bb_imageQueue = []
+	#var bb_imageQueue = []
 	var bb_parsed = []
 	var pageText = desc_arr[offset]
 	var titleText = title_arr[offset]
@@ -114,7 +123,9 @@ func display_text(arr):
 		tab.set_tab_title(tab_no,"")
 		pass
 	else:
-		tab.set_tab_title(tab_no,html2bbcode(titleText))
+		icon = genthumbnail("toast")
+		tab.set_tab_icon(tab_no,icon)
+		tab.set_tab_title(tab_no,"")
 	for i in bb_parsed:
 		rtl.append_bbcode(i)
 		
@@ -159,7 +170,6 @@ func xml_parse(body):
 	display_text([rtl1,0,0])
 	display_text([rtl2,1,1])
 	display_text([rtl3,2,2])
-	emit_signal("draw_blog")
 	tab.tabs_visible = true
 
 #
@@ -172,18 +182,23 @@ func genthumbnail(name):
 	var doresize = true
 	if file.file_exists(thumbnail_path):
 		print("thumbnail exists, gettining")
-		path = thumbnail_path
-		doresize = true
+		#path = thumbnail_path
 	var image_t = Image.new()
 	var error = image_t.load(path)
 	if error != OK:
 		push_error("Couldn't load the image.")
 	var texture = ImageTexture.new();
-	if doresize:
-		var aspect_ratio = float(image_t.get_width()) / float(image_t.get_height())
-		image_t.resize(aspect_ratio*THUMBNAIL_HEIGHT,THUMBNAIL_HEIGHT)
-		image_t.save_png(thumbnail_path)
-	texture.create_from_image(image_t)
+	var new_image = Image.new()
+	if doresize: # we need to pad out the images to fit the width.
+		var aspect_ratio = float(image_t.get_width()) / float(image_t.get_height()) 
+		image_t.resize(aspect_ratio*THUMBNAIL_HEIGHT,THUMBNAIL_HEIGHT,4)
+		var image_width = image_t.get_width()
+		new_image.create(THUMB_WIDTH,THUMBNAIL_HEIGHT,false,Image.FORMAT_RGBA8)
+		var padding_offset = -floor((image_width - THUMB_WIDTH )/2) # dunno why its minus, but this is the offset it needs to be be so it's in the centre of the new image.
+		var image_rect = Rect2(Vector2(0,0),Vector2(image_width,THUMBNAIL_HEIGHT))
+		new_image.blit_rect(image_t,image_rect,Vector2(padding_offset,0)) # blit the thumbnail into the new canvas
+		new_image.save_png(thumbnail_path)
+	texture.create_from_image(new_image)
 	return texture
 
 func gen_tres(image_name):

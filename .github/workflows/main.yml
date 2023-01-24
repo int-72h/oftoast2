@@ -1,2 +1,0 @@
-- name: godot-ci
-  uses: abarichello/godot-ci@3.4.2

@@ -8,7 +8,7 @@
 font_path = "res://assets/Staatliches-Regular.ttf"
 
 [sub_resource type="DynamicFont" id=12]
-size = 33
+size = 50
 font_data = SubResource( 1 )
 
 [sub_resource type="StyleBoxFlat" id=14]
@@ -78,33 +78,33 @@ custom_constants/separation = 0
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
 margin_right = 755.0
-margin_bottom = 42.0
+margin_bottom = 63.0
 custom_fonts/font = SubResource( 12 )
 text = "Version"
 
 [node name="VersionContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
-margin_top = 42.0
+margin_top = 63.0
 margin_right = 755.0
-margin_bottom = 104.0
+margin_bottom = 135.0
 custom_constants/margin_left = 2
 
 [node name="Revision" type="VBoxContainer" parent="MarginContainer/VBoxContainer/VersionContainer"]
 margin_left = 2.0
-margin_right = 136.0
-margin_bottom = 62.0
+margin_right = 171.0
+margin_bottom = 72.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/VersionContainer/Revision"]
-margin_right = 134.0
-margin_bottom = 29.0
+margin_right = 169.0
+margin_bottom = 34.0
 size_flags_horizontal = 3
 text = "Revision to update to:"
 
 [node name="Text" type="LineEdit" parent="MarginContainer/VBoxContainer/VersionContainer/Revision"]
-margin_top = 33.0
-margin_right = 50.0
-margin_bottom = 62.0
+margin_top = 38.0
+margin_right = 60.0
+margin_bottom = 72.0
 grow_vertical = 0
 rect_min_size = Vector2( 50, 22 )
 size_flags_horizontal = 0
@@ -113,21 +113,21 @@ theme = SubResource( 11 )
 text = "fgfd"
 
 [node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
-margin_top = 104.0
+margin_top = 135.0
 margin_right = 755.0
-margin_bottom = 136.0
+margin_bottom = 167.0
 custom_constants/separation = 32
 custom_styles/separator = SubResource( 13 )
 
 [node name="Label2" type="Label" parent="MarginContainer/VBoxContainer"]
-margin_top = 136.0
+margin_top = 167.0
 margin_right = 755.0
-margin_bottom = 178.0
+margin_bottom = 230.0
 custom_fonts/font = SubResource( 12 )
 text = "Launcher"
 
 [node name="LauncherContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
-margin_top = 178.0
+margin_top = 230.0
 margin_right = 755.0
 margin_bottom = 1011.0
 size_flags_horizontal = 3
@@ -139,80 +139,80 @@ custom_constants/margin_bottom = 4
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/LauncherContainer"]
 margin_left = 4.0
 margin_right = 747.0
-margin_bottom = 829.0
+margin_bottom = 777.0
 
 [node name="Threads" type="VBoxContainer" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer"]
 margin_right = 743.0
-margin_bottom = 62.0
+margin_bottom = 72.0
 
 [node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Threads"]
 margin_right = 743.0
-margin_bottom = 29.0
+margin_bottom = 34.0
 text = "No. of threads"
 
 [node name="Text" type="LineEdit" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Threads"]
-margin_top = 33.0
-margin_right = 50.0
-margin_bottom = 62.0
+margin_top = 38.0
+margin_right = 60.0
+margin_bottom = 72.0
 rect_min_size = Vector2( 50, 22 )
 size_flags_horizontal = 0
 size_flags_vertical = 0
 theme = SubResource( 11 )
 
 [node name="MaxDLSpeed" type="VBoxContainer" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer"]
-margin_top = 66.0
+margin_top = 76.0
 margin_right = 743.0
-margin_bottom = 128.0
+margin_bottom = 148.0
 
 [node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/MaxDLSpeed"]
 margin_right = 743.0
-margin_bottom = 29.0
-text = "Maximum Download Speed"
+margin_bottom = 34.0
+text = "Maximum Download Speed (MB/s)"
 
 [node name="Text" type="LineEdit" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/MaxDLSpeed"]
-margin_top = 33.0
-margin_right = 50.0
-margin_bottom = 62.0
+margin_top = 38.0
+margin_right = 60.0
+margin_bottom = 72.0
 rect_min_size = Vector2( 50, 22 )
 size_flags_horizontal = 0
 size_flags_vertical = 0
 theme = SubResource( 11 )
 
 [node name="InstallDir" type="VBoxContainer" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer"]
-margin_top = 132.0
+margin_top = 152.0
 margin_right = 743.0
-margin_bottom = 194.0
+margin_bottom = 224.0
 size_flags_vertical = 0
 
 [node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/InstallDir"]
 margin_right = 743.0
-margin_bottom = 29.0
+margin_bottom = 34.0
 text = "Install directory:"
 
 [node name="Text" type="LineEdit" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/InstallDir"]
-margin_top = 33.0
+margin_top = 38.0
 margin_right = 743.0
-margin_bottom = 62.0
+margin_bottom = 72.0
 rect_min_size = Vector2( 0, 22 )
 size_flags_vertical = 0
 theme = SubResource( 11 )
 text = "this is where the path GOES"
 
 [node name="Mirrors" type="VBoxContainer" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer"]
-margin_top = 198.0
+margin_top = 228.0
 margin_right = 743.0
-margin_bottom = 829.0
+margin_bottom = 777.0
 size_flags_vertical = 3
 
 [node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Mirrors"]
 margin_right = 743.0
-margin_bottom = 29.0
+margin_bottom = 34.0
 text = "Mirrors (each mirror on a new line)"
 
 [node name="Text" type="TextEdit" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Mirrors"]
-margin_top = 33.0
+margin_top = 38.0
 margin_right = 743.0
-margin_bottom = 631.0
+margin_bottom = 549.0
 rect_min_size = Vector2( 0, 35 )
 size_flags_vertical = 3
 theme = SubResource( 11 )
@@ -222,3 +222,9 @@ text = "this is where the path GOES"
 margin_top = 1011.0
 margin_right = 755.0
 margin_bottom = 1015.0
+
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/VersionContainer/Revision/Text" to="." method="_on_revision_changed"]
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Threads/Text" to="." method="_on_threads_changed"]
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/MaxDLSpeed/Text" to="." method="_on_maxdl_changed"]
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/InstallDir/Text" to="." method="_on_installdir_changed"]
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Mirrors/Text" to="." method="_on_mirrors_changed"]
