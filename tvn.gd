@@ -73,16 +73,16 @@ func get_tag(revision): # not the most efficient?
 	var rev_json = JSON.parse(rev)
 	return rev_json["tag"]
 
-func fetch_revisions(url,first, last):
+func fetch_revisions(url,first, last,verif=true):
 	for x in range(first+1,last+1):
 		if not (x<0):
 			var dl = GDDL.new()
 			var rev = dl.download_to_string(url + "revisions/" + str(x))
-			#var sig = dl.download_to_array(url + "revisions/" + str(x) + ".sig")
+			var sig = dl.download_to_array(url + "revisions/" + str(x) + ".sig")
 			if dl.get_error() != OK:
 				return "Download failiure! " + dl.get_detailed_error()
-			#var verified = verif.verify(HashingContext.HASH_SHA256, rev.sha256_buffer(), sig, key_obj)
-			var verified = true
+			var verified
+			verified = verif.verify(HashingContext.HASH_SHA256, rev.sha256_buffer(), sig, key_obj) if verif else true
 			if not verified:
 				return "Signature invalid for revision " + str(x)
 			var rev_json = JSON.parse(rev) ## handle the error here

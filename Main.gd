@@ -3,12 +3,10 @@ extends Control
 const GDDL = preload("res://gdnative/gddl.gdns")
 const TVN = preload("res://tvn.gd")
 onready var tvn = TVN.new()
-#onready var tvn = get_node("/root/Control/Control/tvn")
 onready var steam = get_node("steam")
 var music = preload("res://assets/toast.wav")
 var start_music = preload("res://assets/start.wav")
 var done = preload("res://assets/done.wav")
-const version = "0.0.1"
 var revisions = []
 var arr_of_threads = []
 var downloading
@@ -24,12 +22,10 @@ var latest_rev
 signal all_done
 signal file_done(path)
 signal verif_fail(path)
-signal thread_done(thread_no)
 signal error_handled
-#signal start_spin
-#signal stop_spin
 var path
 var url
+var writes
 var mut = Mutex.new()
 var error_result
 var error_input
@@ -64,19 +60,21 @@ func thing():
 		error_handler("Downloading target threads and/or latest revision failed:\n"+str(gd.get_error()))
 		yield(self,"error_handled")
 		if error_result == RETRY:
-			thing()
-	revisions = tvn.fetch_revisions(url,-1,int(latest_rev)) # returns an error string otherwise
+			return thing()
+	threads = int(threads)
+	latest_rev = int(latest_rev)
+	revisions = tvn.fetch_revisions(url,-1,int(latest_rev),false) # returns an error string otherwise
 	if typeof(revisions) != TYPE_ARRAY:
 		error_handler("Error fetching revisions: " + revisions + "\nThis error is FATAL and cannot be continued past!")
 		yield(self,"error_handled")
 		if error_result == RETRY or error_result == CONTINUE:
-			thing()
+			return thing()
+		else:
+			return
 	changes = tvn.replay_changes(revisions)
-	var writes = filter(tvn.TYPE_WRITE,changes)
+	writes = filter(tvn.TYPE_WRITE,changes)
 	for x in writes:
 		dl_array.append([url + "objects/" + x["object"], path + delim + x["path"],x["hash"]])
-	threads = int(threads)
-	latest_rev = int(latest_rev)
 	$AdvancedPanel.threads.text = str(threads)
 	target_revision = str(latest_rev)
 	$AdvancedPanel.target_rev.text = str(latest_rev)
@@ -90,16 +88,6 @@ func _ready():
 	call_deferred("thing")
 	$advlabel.rect_position = Vector2(-800,0)
 	$AdvancedPanel.rect_position = Vector2(-800,150)
-
-func _on_Verify_pressed():
-	start(true)
-	
-func _on_Update_pressed():
-	start()
-
-
-func _on_Control_file_done():
-	$VBoxContainer3/ProgressBar.value +=1
 	
 func start(verify=false):
 	$VBoxContainer3/Label2.show()
@@ -123,7 +111,6 @@ func start(verify=false):
 		if verify:
 			installed_revision = -1
 		$VBoxContainer3/ProgressBar.max_value = len(dl_array)
-		verify()
 		for x in filter(tvn.TYPE_DELETE,changes):
 			dir = Directory.new()
 			if dir.file_exists(path + delim + x["path"]):
@@ -164,10 +151,12 @@ func start(verify=false):
 	$SFX.play()
 	$Music.stop()
 	$VBoxContainer3/ProgressBar.hide()
+	$VBoxContainer3/ProgressBar.value = 0
 	$VBoxContainer3/Label2.hide()
 	$VBoxContainer/Update.disabled = false
 	$VBoxContainer/Verify.disabled = false
-	
+
+
 
 func _dozip(arr):
 	var url = arr[0]
@@ -213,7 +202,7 @@ func _work(arr):
 					file_downloaded = true
 					print("continuing - bad idea...")
 				if error_result == HCF: # halt and catch fire
-					get_tree().quit() # mos t likely causes leaks but who cares
+					get_tree().quit() # most likely causes leaks but who cares
 				mut.unlock()
 				print("we've unlocked the mutex at least... thread "+ str(thread_no))
 			else:
@@ -223,7 +212,7 @@ func _work(arr):
 	done_threads_arr.append(thread_no)
 
 
-static func filter(type, candidate_array): # used for tvn shenanigans
+func filter(type, candidate_array): # used for tvn shenanigans
 	var filtered_array := []
 	for candidate_value in candidate_array:
 		if candidate_value["type"] == type:
@@ -239,17 +228,15 @@ func work():
 	print_debug("threads started")
 	
 func verify():
-#	var t = Thread.new()
-#	t.start(self,"_verify")
-#	arr_of_threads.append(t)
-	_verify()
+	var t = Thread.new()
+	t.start(self,"_verify")
+	arr_of_threads.append(t)
 
 
 func _verify():
 	var redl_array = []
 	var file = File.new()
 	for dl in dl_array:
-		var f = file.open(dl[1],File.READ)
 		if dl[2] != file.get_md5(dl[1]):
 			print("MISMATCH:" + file.get_md5(dl[1]) + " " + dl[2])
 			emit_signal("verif_fail",dl[1])
@@ -263,16 +250,6 @@ func _verify():
 		work()
 	done_threads_arr.append(0)
 
-func _process(delta):
-	pass
-#	if len(done_threads_arr) > 0:
-#		for t in done_threads_arr:
-#			arr_of_threads[t].wait_to_finish()
-#			done_threads += 1
-#		done_threads_arr = []
-#	if done_threads == int(threads):
-#		emit_signal("all_done")
-
 func error_handler(error,input=false):
 	var dunn = preload("res://assets/this-is-bad.wav")
 	$SFX.stream = dunn
@@ -281,8 +258,8 @@ func error_handler(error,input=false):
 	$Popup1.popup()
 	yield($Popup1,"tpressed")
 	error_result = $Popup1.val
-#	if input:
-#		error_input = $Popup1/LineEdit.text
+	if input:
+		error_input = $Popup1/LineEdit.text # doesn't work as of now
 	emit_signal("error_handled")
 
 func _on_Advanced_pressed():
@@ -317,6 +294,18 @@ func _on_Advanced_pressed():
 		$VBoxContainer/Advanced.disabled = false
 		$advlabel.visible = false
 
+
+func _on_Verify_pressed():
+	start(true)
+	
+func _on_Update_pressed():
+	start()
+
+
+func _on_Control_file_done():
+	#print("done with file " + str($VBoxContainer3/ProgressBar.value) + "/" + str($VBoxContainer3/ProgressBar.max_value))
+	$VBoxContainer3/ProgressBar.value +=1
+
 func _throw_error(): # throws an error
 	error_handler("ERROR TEST... LOVELY")
 	yield(self,"error_handled")
@@ -325,3 +314,13 @@ func _throw_error(): # throws an error
 func _on_error_handled():
 	if error_result == HCF:
 		get_tree().quit()
+		
+func _process(_delta):
+	pass
+	if len(done_threads_arr) > 0:
+		for t in done_threads_arr:
+			arr_of_threads[t].wait_to_finish()
+			done_threads += 1
+		done_threads_arr = []
+	if done_threads == int(threads):
+		emit_signal("all_done")

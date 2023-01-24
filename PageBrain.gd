@@ -44,8 +44,6 @@ func _ready():
 	var dl = GDDL.new()
 	xml_parse(dl.download_to_string("https://openfortress.fun/blog/rss/feed"))
 	
-signal draw_blog()
-signal thread_done(tab_no)
 var txt_bullet = "[EPICBOOL]"; # used for replacing list bullets in final steps
 var title_arr = []
 var desc_arr = []
@@ -62,7 +60,7 @@ func display_text(arr):
 	var offset = arr[1]
 	var tab_no = arr[2]
 	print("hello from tab" + str(tab_no))
-	var bb_imageQueue = []
+	#var bb_imageQueue = []
 	var bb_parsed = []
 	var pageText = desc_arr[offset]
 	var titleText = title_arr[offset]

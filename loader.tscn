@@ -64,9 +64,9 @@ margin_bottom = 40.0
 
 [node name="TextureRect2" type="TextureRect" parent="LoaderUI"]
 margin_left = 8.0
-margin_top = 941.0
-margin_right = 135.0
-margin_bottom = 1068.0
+margin_top = 936.0
+margin_right = 144.0
+margin_bottom = 1075.0
 texture = ExtResource( 7 )
 expand = true
 
@@ -86,7 +86,7 @@ margin_right = 1407.0
 margin_bottom = 891.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 custom_fonts/font = SubResource( 2 )
-text = "A toastware product
+text = "A toastware project
 powered by tvn
 
 
@@ -96,6 +96,7 @@ codename \"pinnacle\""
 align = 2
 
 [node name="Label4" type="Label" parent="LoaderUI"]
+visible = false
 margin_left = 13.0
 margin_top = 577.0
 margin_right = 429.0

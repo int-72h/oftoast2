@@ -5,7 +5,7 @@ const default_url = "https://toast1.openfortress.fun/toast"
 var gd = GDDL.new()
 var mainn
 const version = "0.0.1"
-signal done_loading
+
 var t = Thread.new()
 var thread_done = false
 signal error_handled
