@@ -1,6 +1,5 @@
 extends Control
 const GDDL = preload("res://gdnative/gddl.gdns")
-onready var tvn = get_node("/root/Control/Control/tvn")
 enum {
 	HTML_P,
 	HTML_H1,
@@ -16,7 +15,7 @@ func html2bbcode(pageText):
 	pageText = pageText.replace("<b>", "[b]");
 	pageText = pageText.replace("</b>", "[/b]");
 	pageText = pageText.replace("<em>", "[i]");
-	pageText = pageText.replace("</em>", "[/i]");	
+	pageText = pageText.replace("</em>", "[/i]");
 	pageText = pageText.replace("<h1>", "[font=res://fonts/font_header.tres]");
 	pageText = pageText.replace("</h1>", "[/font][LINEEND]");
 	pageText = pageText.replace("<p>", "");
@@ -27,11 +26,23 @@ func html2bbcode(pageText):
 	pageText = pageText.replace("</li>", "");
 	pageText = pageText.replace("&amp;", "&");
 	pageText = pageText.replace("]]>", "");
+	pageText = pageText.replace("]]>", "");
+	pageText = pageText.replace("<ins>", "");
+	pageText = pageText.replace("</ins>", "");
+	var z = pageText.find("<a")
+	while z != -1:
+		var tmp = pageText.substr(z)
+		var tag = pageText.substr(z,tmp.find(">")+1)
+		var url = tag.substr(tag.find("href=\"")+6,tag.find_last("\""))
+		pageText = pageText.replace(tag,"[url=" + url +"]")
+		z = pageText.find("<a")
+	pageText = pageText.replace("</a>","[/url]")
 	return pageText
 
 
 func _ready():
-	xml_parse(tvn.dl_file_to_mem("https://openfortress.fun/blog/rss/feed",false)) # get rss
+	var dl = GDDL.new()
+	xml_parse(dl.download_to_string("https://openfortress.fun/blog/rss/feed"))
 	
 signal draw_blog()
 signal thread_done(tab_no)
@@ -161,7 +172,6 @@ func xml_parse(body):
 	display_text([rtl1,0,0])
 	display_text([rtl2,1,1])
 	display_text([rtl3,2,2])
-	emit_signal("draw_blog")
 	tab.tabs_visible = true
 
 #

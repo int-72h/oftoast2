@@ -32,23 +32,13 @@ scroll_horizontal_enabled = false
 margin_left = 16.0
 margin_top = 16.0
 margin_right = 856.0
-margin_bottom = 230.0
+margin_bottom = 58.0
 rect_min_size = Vector2( 840, 0 )
 rect_clip_content = false
 custom_styles/normal = SubResource( 2 )
 bbcode_enabled = true
-bbcode_text = "[b]If you're seeing this, something with the blog panel code has broken. So here's a fun easter egg. [/b]
-[b]Shoutout to:[/b]
-Pyspy
-Charlotte for holding the fort
-Everyone on the dev team
-The launchers we lost along the way"
-text = "[b]If you're seeing this, something with the blog panel code has broken. So here's a fun easter egg. [/b]
-[b]Shoutout to:[/b]
-Pyspy
-Charlotte for holding the fort
-Everyone on the dev team
-The launchers we lost along the way"
+bbcode_text = "toast lol"
+text = "toast lol"
 fit_content_height = true
 
 [node name="PageViewer2" type="ScrollContainer" parent="."]
@@ -63,21 +53,11 @@ scroll_horizontal_enabled = false
 margin_left = 16.0
 margin_top = 16.0
 margin_right = 856.0
-margin_bottom = 197.0
+margin_bottom = 222.0
 rect_min_size = Vector2( 840, 0 )
 rect_clip_content = false
 custom_styles/normal = SubResource( 2 )
 bbcode_enabled = true
-bbcode_text = "[b]shoutout to:[/b]
-Pyspy
-charlotte for holding the fort
-everyone on the dev team
- welt for not implementing the zip patch :]]]]]]]]]]]"
-text = "[b]shoutout to:[/b]
-Pyspy
-charlotte for holding the fort
-everyone on the dev team
- welt for not implementing the zip patch :]]]]]]]]]]]"
 fit_content_height = true
 
 [node name="PageViewer3" type="ScrollContainer" parent="."]
@@ -95,19 +75,9 @@ scroll_horizontal_enabled = false
 margin_left = 16.0
 margin_top = 16.0
 margin_right = 856.0
-margin_bottom = 197.0
+margin_bottom = 222.0
 rect_min_size = Vector2( 840, 0 )
 rect_clip_content = false
 custom_styles/normal = SubResource( 2 )
 bbcode_enabled = true
-bbcode_text = "[b]shoutout to:[/b]
-Pyspy
-charlotte for holding the fort
-everyone on the dev team
- welt for not implementing the zip patch :]]]]]]]]]]]"
-text = "[b]shoutout to:[/b]
-Pyspy
-charlotte for holding the fort
-everyone on the dev team
- welt for not implementing the zip patch :]]]]]]]]]]]"
 fit_content_height = true

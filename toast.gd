@@ -30,6 +30,7 @@ func _ready():
 		tween.tween_property(self,"rect_rotation",rect_rotation + 360,5)
 	
 func stop():
+	print("stopped")
 	spin = false
 	tween.stop()
 	tween = get_tree().create_tween().set_parallel(true)

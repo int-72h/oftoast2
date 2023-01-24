@@ -1,22 +1,18 @@
-extends ConfirmationDialog
+extends WindowDialog
 
 var val
-signal pressed
-func _ready():
-	get_cancel().connect("pressed", self, "cancel")
-	get_ok().connect("pressed",self,"ok")
-
-func get_val(text):
-	dialog_text = text
-	popup()
-	yield(self,"pressed")
-	return val # 0 = retry, 1=ok
-
-
-func cancel():
+signal tpressed
+func _on_Button_pressed():
 	val = 0
-	emit_signal("pressed")
+	hide()
+	emit_signal("tpressed")
 	
-func ok():
+func _on_Button3_pressed():
 	val = 1
-	emit_signal("pressed")
+	hide()
+	emit_signal("tpressed")
+
+func _on_Button2_pressed():
+	val = 2
+	hide()
+	emit_signal("tpressed")

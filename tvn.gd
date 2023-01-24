@@ -2,19 +2,20 @@ extends Node
 class_name tvn
 const GDDL = preload("res://gdnative/gddl.gdns")
 var revisions = []
-var ua = ""
 var url
 var key_obj =  CryptoKey.new()
 var verif = Crypto.new()
+const FAIL = 1
+var dl_error = ""
 const TYPE_WRITE = 0
 const TYPE_DELETE = 2
 const TYPE_MKDIR = 1
-const OK = 0
-const FAIL = 1
-signal tvn_ready
+
 
 func _ready():
 	key_obj.load("res://assets/pubkey.pub",true)
+
+
 
 func replay_changes(changesets):
 	var cumlmap = {}
@@ -60,72 +61,34 @@ func get_installed_revision(dir):
 
 func check_partial_download(dir):
 	var file = File.new() 
-	var error = file.open("/.dl_started", File.READ)
+	var error = file.open(dir + "/.dl_started", File.READ)
 	if error != OK:
 		return FAIL
 	else:
 		return int(file.get_as_text())
 
-
-func download_file(url,path):
-	var data = GDDL.new()
-	data.set_agent(ua)
-	data.download_file(url,path)
-	if not data:
-		return data.get_error()
-	else:
-		return OK
-
-
-func dl_file_to_mem(url,bin=false):
-	var data = GDDL.new()
-	data.set_agent(ua)
-	if bin == false:
-		var ret = data.download_to_string(url)
-		if ret:
-			return ret
-		else:
-			return data.get_error()
-	else:
-		var z = data.download_to_array(url)
-		if not z:
-			return data.get_error()
-		return z
-	
-	
-
-func get_mirrors(url):
-	var mirrorlist # do mirror things idk
-
-
-func get_tag(revision):
+func get_tag(revision): # not the most efficient?
 	var dl = GDDL.new()
-	var rev = dl_file_to_mem("/revisions/" + str(revision))
-	var sig = dl_file_to_mem("/revisions/" + str(revision) + ".sig",true)
-	var verified = verif.verify(HashingContext.HASH_SHA256, rev.sha256_buffer(), sig, key_obj)
+	var rev = dl.download_to_sring("/revisions/" + str(revision),key_obj)
 	var rev_json = JSON.parse(rev)
-	return revision["tag"]
-
-func set_url(_url):
-	if _url[-1] != '/':
-		_url += '/'
-	url = _url
-
+	return rev_json["tag"]
 
 func fetch_revisions(url,first, last):
 	for x in range(first+1,last+1):
 		if not (x<0):
-			var error = false
 			var dl = GDDL.new()
-			dl.set_agent(ua)
-			var rev = dl_file_to_mem(url + "revisions/" + str(x))
-			var sig = dl_file_to_mem(url + "revisions/" + str(x) + ".sig",true)
-			var verified = verif.verify(HashingContext.HASH_SHA256, rev.sha256_buffer(), sig, key_obj)
+			var rev = dl.download_to_string(url + "revisions/" + str(x))
+			#var sig = dl.download_to_array(url + "revisions/" + str(x) + ".sig")
+			if dl.get_error() != OK:
+				return "Download failiure! " + dl.get_detailed_error()
+			#var verified = verif.verify(HashingContext.HASH_SHA256, rev.sha256_buffer(), sig, key_obj)
+			var verified = true
+			if not verified:
+				return "Signature invalid for revision " + str(x)
 			var rev_json = JSON.parse(rev) ## handle the error here
-			#if rev_json.result["revision"] != x:
-			#	error = true
-			if (error == true) or (rev_json.error != OK):
-				return -1
-			revisions.append(rev_json.result) # ["changes"]
-			print("fetched revision " + str(x))
+			if rev_json.error != OK:
+				return "Invalid JSON, Possible tampering serverside!"
+			if rev_json.result["revision"] != x:
+				return "Revision field doesn't match with file. Possible tampering serverside!"
+			revisions.append(rev_json.result["changes"])
 	return revisions

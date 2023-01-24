@@ -4,7 +4,7 @@ onready var threads = $MarginContainer/VBoxContainer/LauncherContainer/VBoxConta
 onready var maxdl = $MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/MaxDLSpeed/Text
 onready var inst_dir = $MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/InstallDir/Text
 onready var mirrors = $MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Mirrors/Text
-
+const MAX_THREADS = 10
 
 
 # Declare member variables here. Examples:
@@ -25,14 +25,18 @@ func _ready():
 
 func _on_revision_changed(new_text):
 	print(new_text)
-
+	if int(new_text) < -1 or int(new_text) > get_node("/root/Control/Control").latest_rev:
+		new_text.erase(new_text.length()-1,1)
+		target_rev.text = new_text
+	get_node("/root/Control/Control").target_revision = target_rev.text
 
 func _on_threads_changed(new_text):
 	print(new_text)
+	get_node("/root/Control/Control").threads = threads.text
 
 
 func _on_maxdl_changed(new_text):
-	print(new_text)
+	print(new_text) # do this on the back end eventually
 
 
 func _on_installdir_changed(new_text):
