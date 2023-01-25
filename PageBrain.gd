@@ -123,7 +123,7 @@ func display_text(arr):
 		tab.set_tab_title(tab_no,"")
 		pass
 	else:
-		icon = genthumbnail("toast")
+		icon = genthumbnail()
 		tab.set_tab_icon(tab_no,icon)
 		tab.set_tab_title(tab_no,"")
 	for i in bb_parsed:
@@ -171,13 +171,16 @@ func xml_parse(body):
 	display_text([rtl2,1,1])
 	display_text([rtl3,2,2])
 	tab.tabs_visible = true
-
-#
-			
 	
-func genthumbnail(name):
-	var thumbnail_path = "user://thumb_" + name + ".png"
-	var path  = "user://" + name + ".png"
+func genthumbnail(name=null):
+	var thumbnail_path
+	var path
+	if name == null:
+		thumbnail_path = "user://thumb_toast.png"
+		path = "res://assets/toast.png"
+	else:
+		thumbnail_path = "user://thumb_" + name + ".png"
+		path  = "user://" + name + ".png"
 	var file = File.new()
 	var doresize = true
 	if file.file_exists(thumbnail_path):
