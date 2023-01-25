@@ -133,3 +133,7 @@ text = "2.0"
 [node name="SFX" type="AudioStreamPlayer" parent="."]
 
 [node name="Popup1" parent="." instance=ExtResource( 6 )]
+margin_left = 24.0
+margin_top = -1056.0
+margin_right = -731.0
+margin_bottom = -771.0

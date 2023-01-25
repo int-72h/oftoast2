@@ -3,9 +3,42 @@ on: push
 
 env:
   GODOT_VERSION: 3.5.1
-  EXPORT_NAME: oftoast2
 
 jobs:
+  export-windows:
+    name: Windows Export
+    runs-on: ubuntu-20.04
+    container:
+      image: barichello/godot-ci:3.5.1
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+      - name: Download artifact
+        id: download-artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          workflow: build-windows.yml
+          workflow_conclusion: success
+          repo: toastware/oftoast2-gdnative
+      - name: Setup
+        run: |
+          cp windows-native/gddl.dll libgddl.dll
+          cp windows-native/gddl.dll gdnative/windows/libgddl.dll
+          mkdir -v -p ~/.local/share/godot/templates
+          mv /root/.local/share/godot/templates/${GODOT_VERSION}.stable ~/.local/share/godot/templates/${GODOT_VERSION}.stable
+      - name: Windows Build
+        run: |
+          mkdir -v -p build/windows
+          godot -v --export "Windows Desktop" build/windows/oftoast2.exe
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: windows
+          path: build/windows/
+          
   export-linux:
     name: Linux Export
     runs-on: ubuntu-20.04
@@ -23,16 +56,17 @@ jobs:
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow: build-linux.yml
           workflow_conclusion: success
-          repo: toastware/oftoast2-gdnative
+          repo: toastware/oftoast2-gdnative  
       - name: Setup
         run: |
-          cp libgddl.so gdnative/linuxbsd/libgddl.so
+          cp linux/libgddl.so .
+          cp linux/libgddl.so gdnative/linuxbsd/libgddl.so
           mkdir -v -p ~/.local/share/godot/templates
           mv /root/.local/share/godot/templates/${GODOT_VERSION}.stable ~/.local/share/godot/templates/${GODOT_VERSION}.stable
       - name: Linux Build
         run: |
           mkdir -v -p build/linux
-          godot -v --export "Linux/X11" build/linux/$EXPORT_NAME.x86_64
+          godot -v --export "Linux/X11" build/linux/oftoast2.x86_64
       - name: Upload Artifact
         uses: actions/upload-artifact@v1
         with:
