@@ -38,7 +38,7 @@ jobs:
         with:
           name: windows
           path: build/windows/
-
+          
   export-linux:
     name: Linux Export
     runs-on: ubuntu-20.04
@@ -56,8 +56,7 @@ jobs:
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow: build-linux.yml
           workflow_conclusion: success
-          repo: toastware/oftoast2-gdnative     
-
+          
       - name: Setup
         run: |
           cp linux/libgddl.so .
