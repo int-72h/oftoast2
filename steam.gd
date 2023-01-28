@@ -62,3 +62,57 @@ func check_tf2_sdk_exists():
 		tf2_exists = true
 			
 			
+
+func check_disk_space(path):
+	if OS.get_name() == "X11":
+		print("getting disk space...")
+		var cmdstring = "df -PT | awk '{ if (NR!=1) {print $5, $7}}'"
+		var temp = File.new()
+		var tomp = Directory.new()
+		tomp.remove("user://tmp.sh")
+		temp.open("user://tmp.sh",File.WRITE)
+		var sh_path = ProjectSettings.globalize_path("user://tmp.sh")
+		temp.store_string(cmdstring)
+		temp.close()
+		var reg = []
+		OS.execute("bash",[sh_path],true,reg)
+		var a = []
+		for x in reg:
+			for z in x.split("\n"):
+				var f = z.split(" ")
+				a.append(f)
+		print(a)
+		var longest = [0,0]
+		for x in a:
+			if len(x) > 1:
+				if path.begins_with(x[1]):
+					if len(x[1]) > longest[0]:
+						longest[0] = len(x[1])
+						longest[1] = x
+		if longest == [0,0]:
+			return true
+		if int(longest[1][0]) < 8589935: # 8gib, 1k blocks
+			return false
+		return true
+	if OS.get_name() == "Windows":
+		var cmd_str = "wmic logicaldisk get freespace,caption"
+		var temp = File.new()
+		var tomp = Directory.new()
+		tomp.remove("user://tmp.bat")
+		temp.open("user://tmp.bat",File.WRITE)
+		var bat_path = ProjectSettings.globalize_path("user://tmp.bat")
+		temp.store_string(cmd_str)
+		temp.close()
+		var reg = []
+		OS.execute("cmd.exe",["/C",bat_path],true,reg)
+		var a = []
+		for x in reg:
+			for z in x.split("\n"):
+				var f = z.split(" ")
+				a.append(f)
+		a.pop_front() #remove caption
+		for x in a:
+			if path.begins_with(x[0]):
+				if int(x[1]) <= 8589934592: #bytes
+					return false
+				return true

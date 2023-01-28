@@ -6,9 +6,11 @@ signal file_done(path)
 signal verif_fail(path)
 signal error_handled
 signal started
+signal settings_ok
 const CONTINUE = 0
 const RETRY = 1
 const HCF = 2  # use an enum damnit!!!!!!
+const INPUT = 3
 const GDDL = preload("res://gdnative/gddl.gdns")
 const TVN = preload("res://tvn.gd")
 var music = preload("res://assets/toast.wav")
@@ -21,18 +23,19 @@ var done_threads = 0
 var done_threads_arr = []
 var failed_files = []
 var dl_array = []
-var threads = 8
+var threads: int = 8
 var delim = ""
 var changes
 var installed_revision
+var max_threads
 var latest_rev
 var path
 var url
 var writes
 var mut = Mutex.new()
-var error_result
-var error_input
-var target_revision
+var error_result: int
+var error_input: String
+var target_revision: int
 onready var tvn = TVN.new()
 onready var steam = get_node("steam")
 
@@ -65,7 +68,8 @@ func thing():
 		installed_revision = tvn.get_installed_revision(path)  # see if anythings already where we're downloading
 		print("installed revision: " + str(installed_revision))
 		$AdvancedPanel.inst_dir.text = path
-	threads = gd.download_to_string(url + "/reithreads")
+	max_threads = int(gd.download_to_string(url + "/reithreads")) # this will fail, verify
+	threads = max_threads
 	latest_rev = gd.download_to_string(url + "/revisions/latest")
 	if gd.get_error() != OK:
 		error_handler(
@@ -76,23 +80,8 @@ func thing():
 			return thing()
 	threads = int(threads)
 	latest_rev = int(latest_rev)
-	revisions = tvn.fetch_revisions(url, -1, int(latest_rev), false)  # returns an error string otherwise
-	if typeof(revisions) != TYPE_ARRAY:
-		error_handler(
-			(
-				"Error fetching revisions: "
-				+ revisions
-			),false,false)
-		yield(self, "error_handled")
-		if error_result == RETRY or error_result == CONTINUE:
-			return thing()
-		return
-	changes = tvn.replay_changes(revisions)
-	writes = filter(tvn.TYPE_WRITE, changes)
-	for x in writes:
-		dl_array.append([url + "objects/" + x["object"], path + delim + x["path"], x["hash"]])
 	$AdvancedPanel.threads.text = str(threads)
-	target_revision = str(latest_rev)
+	target_revision = latest_rev
 	$AdvancedPanel.target_rev.text = str(latest_rev)
 	$VBoxContainer2/Label.text = "INSTALLED: " + str(latest_rev)
 	$VBoxContainer2/Label2.text = "LATEST: " + str(latest_rev)
@@ -142,7 +131,7 @@ func start(verify = false):
 		error = file.open(path + "/.dl_started", File.WRITE)  # allows us to check for partial dls
 		if error != OK:
 			error_handler(
-				"can't write dl_started file... this is a non-issue really, but could be a sign for worse things. Press OK to continue."
+				"can't write dl_started file... this is a non-issue really, but could be a sign for worse things. Press the continue button to continue."
 			)
 			yield(self, "error_handled")
 		file.store_string(str(latest_rev))
@@ -157,8 +146,7 @@ func start(verify = false):
 	error = file.open(path + "/.revision", File.WRITE)
 	if error != OK:
 		error_handler(
-			"Failed to write .revision file: the game may launch, however it won't update without a complete reinstall.\nThis could be due to a permissions error, running out of space, or something else."
-		)
+			"Failed to write .revision file: the game may launch, however it won't update without a complete reinstall.\nThis could be due to a permissions error, running out of space, or something else.\nTo fix this manually, simply put a file called .revision in the open_fortress folder with the current revision number in.")
 		yield(self, "error_handled")
 	file.store_string(str(latest_rev))
 	file.close()
@@ -179,8 +167,12 @@ func _dozip(arr):
 	var ziploc = ProjectSettings.globalize_path("user://latest.zip")
 	var error = tvn.download_file(url, ziploc)
 	if error != tvn.OK:
-		error_handler("failed to download zip: " + error)
+		error_handler("failed to download zip: " + error,false,false)
 		yield(self, "error_handled")
+		match error_result:
+			RETRY:
+				return _dozip(arr)
+			
 	var z = dl_object.unzip(ziploc, lpath)
 	if z != "0":
 		error_handler("failed to unzip!")
@@ -218,12 +210,12 @@ func _work(arr):
 				print("uh oh.")
 				error_handler(dl_object.get_detailed_error() + " Path: " + path + "\n url: " + url)
 				yield(self, "error_handled")
-				if error_result == CONTINUE:
-					emit_signal("file_done")
-					file_downloaded = true
-					print("continuing - bad idea...")
-				if error_result == HCF:  # halt and catch fire
-					get_tree().quit()  # most likely causes leaks but who cares
+				match error_result: # if we're retrying then we don't need to specify anything
+					CONTINUE:
+						emit_signal("file_done")
+						file_downloaded = true
+						print("continuing - bad idea...")
+					
 				mut.unlock()
 				print("we've unlocked the mutex at least... thread " + str(thread_no))
 			else:
@@ -239,6 +231,20 @@ func filter(type, candidate_array):  # used for tvn shenanigans
 		if candidate_value["type"] == type:
 			filtered_array.append(candidate_value)
 	return filtered_array
+
+func do_stuff():
+	revisions = tvn.fetch_revisions(url, -1, int(latest_rev), false)  # returns an error string otherwise
+	if typeof(revisions) != TYPE_ARRAY:
+		error_handler(("Error fetching revisions: "+ revisions),false,false)
+		yield(self, "error_handled")
+		if error_result == RETRY or error_result == CONTINUE:
+			return thing()
+		return
+	changes = tvn.replay_changes(revisions)
+	writes = filter(tvn.TYPE_WRITE, changes)
+	for x in writes:
+		dl_array.append([url + "objects/" + x["object"], path + delim + x["path"], x["hash"]])
+	print("stuff done")
 
 
 
@@ -275,16 +281,19 @@ func error_handler(error, input = false,cont=true):
 	$Popup1.popup()
 	yield($Popup1, "tpressed")
 	error_result = $Popup1.val
-	if input:
+	if input and $Popup1.val == INPUT:
 		error_input = $Popup1.text  # doesn't work as of now
 	emit_signal("error_handled")
 
 
 func _on_Advanced_pressed():
+	print($VBoxContainer/Advanced.disabled)
 	var transition = Tween.TRANS_BACK
 	var easeing = Tween.EASE_IN_OUT
 	var time = 0.75
 	if !$AdvancedPanel.visible:
+		$VBoxContainer/Update.disabled = true
+		$VBoxContainer/Verify.disabled = true
 		$AdvancedPanel.visible = true
 		$advlabel.visible = true
 		$VBoxContainer/Advanced.disabled = true
@@ -308,8 +317,13 @@ func _on_Advanced_pressed():
 		$VBoxContainer3/BlogPanel.visible = false
 		$VBoxContainer/Advanced.disabled = false
 	else:
+		
 		$VBoxContainer3/BlogPanel.visible = true
 		$VBoxContainer/Advanced.disabled = true
+		var z = check_settings()
+		if typeof(z) == TYPE_OBJECT:
+			yield(z,"completed")
+			yield(self,"settings_ok")
 		var tween = get_tree().create_tween().set_parallel(true)
 		tween.tween_property($AdvancedPanel, "rect_position", Vector2(-900, 150), time).set_trans(transition).set_ease(
 			easeing
@@ -326,8 +340,59 @@ func _on_Advanced_pressed():
 		yield(get_tree().create_timer(0.5), "timeout")
 		$AdvancedPanel.visible = !$AdvancedPanel.visible
 		$VBoxContainer/Advanced.disabled = false
-		$advlabel.visible = false
+		$VBoxContainer/Update.disabled = false
+		$VBoxContainer/Verify.disabled = false
 
+
+func check_settings(): # this is awful rewrite at some point
+	if target_revision > latest_rev or target_revision < 0:
+		error_handler("invalid revision",true,false)
+		yield(self,"error_handled")
+		match error_result:
+			INPUT:
+				if error_input.is_valid_integer():
+					target_revision = int(error_input)
+				else:
+					return check_settings()
+			RETRY:
+				return check_settings()
+	if threads > int(max_threads) or threads < 1:
+		error_handler("invalid thread count, must be greater than 1 or smaller than " + str(max_threads),true,false)
+		yield(self,"error_handled")
+		match error_result:
+			INPUT:
+				if error_input.is_valid_integer():
+					threads = int(error_input)
+				else:
+					return check_settings()
+			RETRY:
+				return check_settings()
+	if not check_install_path(path):
+		error_handler("Invalid path. Maybe you haven't got enough space idk.",true,false)
+		yield(self,"error_handled")
+		match error_result:
+			INPUT:
+				if check_install_path(error_input):
+					path = error_input
+				else:
+					return check_settings()
+			RETRY:
+				return check_settings()
+	do_stuff()
+	emit_signal("settings_ok")
+	
+
+
+
+func check_install_path(path): # file picker does most of this for us but we need to check a few things 
+	if not steam.check_disk_space(path):
+		return false
+	print("passed disk check")
+	var file = File.new()
+	var error = file.open(path.plus_file(".toast-test"), File.WRITE)
+	if error != OK:
+		return false
+	return true
 
 func _on_Verify_pressed():
 	start(true)
@@ -361,3 +426,7 @@ func _process(_delta):
 		done_threads_arr = []
 	if done_threads == int(threads):
 		emit_signal("all_done")
+
+
+func _on_AdvancedPanel_picker_open():
+	$FileDialog.popup()

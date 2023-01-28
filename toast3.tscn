@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://spin.gd" type="Script" id=3]
+[ext_resource path="res://toast_20k.glb" type="PackedScene" id=5]
+
+[node name="Spatial" type="Spatial"]
+script = ExtResource( 3 )
+
+[node name="OmniLight" type="OmniLight" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.71507, -0.524444, 0.949491 )
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.44425 )
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+
+[node name="toast_20k" parent="." instance=ExtResource( 5 )]
+transform = Transform( -0.2, -1.74846e-08, 7.64274e-16, 0, -8.74228e-09, -0.2, 1.74846e-08, -0.2, 8.74228e-09, 0, 0, 0 )

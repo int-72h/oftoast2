@@ -189,14 +189,11 @@ margin_right = 743.0
 margin_bottom = 34.0
 text = "Install directory:"
 
-[node name="Text" type="LineEdit" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/InstallDir"]
+[node name="Button" type="Button" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/InstallDir"]
 margin_top = 38.0
 margin_right = 743.0
 margin_bottom = 72.0
-rect_min_size = Vector2( 0, 22 )
-size_flags_vertical = 0
-theme = SubResource( 11 )
-text = "this is where the path GOES"
+text = "Choose Path"
 
 [node name="Mirrors" type="VBoxContainer" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer"]
 margin_top = 228.0
@@ -226,5 +223,5 @@ margin_bottom = 1015.0
 [connection signal="text_changed" from="MarginContainer/VBoxContainer/VersionContainer/Revision/Text" to="." method="_on_revision_changed"]
 [connection signal="text_changed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Threads/Text" to="." method="_on_threads_changed"]
 [connection signal="text_changed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/MaxDLSpeed/Text" to="." method="_on_maxdl_changed"]
-[connection signal="text_changed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/InstallDir/Text" to="." method="_on_installdir_changed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/InstallDir/Button" to="." method="_on_Button_pressed"]
 [connection signal="text_changed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Mirrors/Text" to="." method="_on_mirrors_changed"]

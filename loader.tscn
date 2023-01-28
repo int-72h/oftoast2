@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://loader.gd" type="Script" id=1]
 [ext_resource path="res://assets/toast.png" type="Texture" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://Popup.tscn" type="PackedScene" id=6]
 [ext_resource path="res://assets/slateware-of.png" type="Texture" id=7]
 [ext_resource path="res://assets/dm_thames_widescreen_toast.png" type="Texture" id=8]
+[ext_resource path="res://toast3.tscn" type="PackedScene" id=9]
 
 [sub_resource type="DynamicFontData" id=5]
 font_path = "res://assets/Staatliches-Regular.ttf"
@@ -46,12 +47,11 @@ texture = ExtResource( 8 )
 stretch_mode = 5
 
 [node name="TextureRect" type="TextureRect" parent="."]
-modulate = Color( 1, 1, 1, 0.521569 )
+modulate = Color( 1, 1, 1, 0 )
 margin_left = -333.0
 margin_top = -176.0
 margin_right = 417.0
 margin_bottom = 574.0
-rect_rotation = 20.0
 rect_pivot_offset = Vector2( 375, 375 )
 texture = ExtResource( 2 )
 expand = true
@@ -80,13 +80,13 @@ custom_fonts/font = ExtResource( 3 )
 text = "OFtoast"
 
 [node name="Label3" type="Label" parent="LoaderUI"]
-margin_left = 847.0
-margin_top = 257.0
-margin_right = 1407.0
-margin_bottom = 891.0
+margin_left = 552.0
+margin_top = 264.0
+margin_right = 1412.0
+margin_bottom = 898.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 custom_fonts/font = SubResource( 2 )
-text = "A toastware project
+text = "a toastware project
 powered by tvn
 
 
@@ -111,13 +111,14 @@ pont (UI Design)
 Bryson"
 
 [node name="Label5" type="Label" parent="LoaderUI"]
-margin_left = 153.0
-margin_top = 958.0
-margin_right = 758.0
-margin_bottom = 1066.0
+margin_left = 152.0
+margin_top = 936.0
+margin_right = 757.0
+margin_bottom = 1081.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 custom_fonts/font = SubResource( 7 )
-text = "(c) Toastware 2023.
+text = "A Toastware project for Superdiffusion.
+(c) Superdiffusion 2023.
 This product is FREE SOFTWARE, you can distribute/modify it according
 to the terms of the MIT License. See about page for more info."
 
@@ -133,7 +134,22 @@ text = "2.0"
 [node name="SFX" type="AudioStreamPlayer" parent="."]
 
 [node name="Popup1" parent="." instance=ExtResource( 6 )]
-margin_left = 24.0
-margin_top = -1056.0
-margin_right = -731.0
-margin_bottom = -771.0
+margin_left = 40.0
+margin_top = -464.0
+margin_right = -715.0
+margin_bottom = -179.0
+
+[node name="ViewportContainer" type="ViewportContainer" parent="."]
+margin_left = -688.0
+margin_top = -536.0
+margin_right = 776.0
+margin_bottom = 944.0
+stretch = true
+
+[node name="Viewport" type="Viewport" parent="ViewportContainer"]
+size = Vector2( 1464, 1480 )
+transparent_bg = true
+handle_input_locally = false
+render_target_update_mode = 3
+
+[node name="Spatial" parent="ViewportContainer/Viewport" instance=ExtResource( 9 )]
