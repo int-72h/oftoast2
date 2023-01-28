@@ -35,9 +35,11 @@ func stop():
 	tween.stop()
 	tween = get_tree().create_tween().set_parallel(true)
 	tween.tween_property(self,"rect_rotation",rect_rotation + (360 - (int(rect_rotation) % 360)),2).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self,"modulate",Color.white,2)
 
 func switch():
 	tween.stop()
+	#yield(get_tree().create_timer(2),"timeout")
 	var tween = get_tree().create_tween().set_parallel()
 	var time = 1.5
 	var trans = Tween.TRANS_QUART

@@ -56,7 +56,8 @@ func _ready():
 			INPUT:
 				default_url = error_input
 	yield(get_tree().create_timer(3),"timeout")
-	$TextureRect.call("stop")
+	$ViewportContainer/Viewport/Spatial.stop()
+	$TextureRect.stop()
 	yield(get_tree().create_timer(2),"timeout")
 	mainn = main.instance()
 	add_child(mainn)
