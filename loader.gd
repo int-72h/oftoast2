@@ -29,6 +29,7 @@ func _ready():
 				print("??????? something's gone wrong are you on wine")
 				get_tree().quit()
 		OS.execute(OS.get_executable_path(),[],false)
+		yield(get_tree().create_timer(5),"timeout")
 		get_tree().quit()
 #	var newver = gd.download_to_string("/latest_launcher_ver")  ## commented out for now as it hasn't been implemented serverside yet, but it does work
 #	if newver > version:

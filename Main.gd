@@ -113,6 +113,7 @@ func start(verify = false):
 			$VBoxContainer3/Label2.text = "Verifying..."
 			installed_revision = -1
 		$VBoxContainer3/ProgressBar.max_value = len(dl_array)
+		$VBoxContainer3/ProgressBar.value = 0
 		for x in filter(tvn.TYPE_DELETE, changes):
 			dir = Directory.new()
 			if dir.file_exists(path + delim + x["path"]):
@@ -260,7 +261,7 @@ func _verify():
 	for dl in dl_array:
 		if dl[2] != file.get_md5(dl[1]):
 			print("MISMATCH:" + file.get_md5(dl[1]) + " " + dl[2])
-			emit_signal("verif_fail", dl[1])
+			#emit_signal("verif_fail", dl[1])
 			redl_array.append(dl)
 		else:
 			emit_signal("file_done")
@@ -282,7 +283,10 @@ func error_handler(error, input = false,cont=true):
 	yield($Popup1, "tpressed")
 	error_result = $Popup1.val
 	if input and $Popup1.val == INPUT:
-		error_input = $Popup1.text  # doesn't work as of now
+		if $Popup1.text == null:
+			error_result = RETRY
+		else:
+			error_input = $Popup1.text 
 	emit_signal("error_handled")
 
 
@@ -345,17 +349,17 @@ func _on_Advanced_pressed():
 
 
 func check_settings(): # this is awful rewrite at some point
-	if target_revision > latest_rev or target_revision < 0:
-		error_handler("invalid revision",true,false)
-		yield(self,"error_handled")
-		match error_result:
-			INPUT:
-				if error_input.is_valid_integer():
-					target_revision = int(error_input)
-				else:
-					return check_settings()
-			RETRY:
-				return check_settings()
+#	if target_revision > latest_rev or target_revision < 0 or target:
+#		error_handler("invalid revision",true,false)
+#		yield(self,"error_handled")
+#		match error_result:
+#			INPUT:
+#				if error_input.is_valid_integer():
+#					target_revision = int(error_input)
+#				else:
+#					return check_settings()
+#			RETRY:
+#				return check_settings()
 	if threads > int(max_threads) or threads < 1:
 		error_handler("invalid thread count, must be greater than 1 or smaller than " + str(max_threads),true,false)
 		yield(self,"error_handled")
@@ -378,7 +382,6 @@ func check_settings(): # this is awful rewrite at some point
 					return check_settings()
 			RETRY:
 				return check_settings()
-	do_stuff()
 	emit_signal("settings_ok")
 	
 

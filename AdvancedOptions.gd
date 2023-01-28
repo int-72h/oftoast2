@@ -16,8 +16,8 @@ signal picker_open
 func _ready():
 	pass # Replace with function body.
 
-func _on_revision_changed(new_text):
-	get_node("/root/Control/Control").target_revision = target_rev.text
+#func _on_revision_changed(new_text):
+#	get_node("/root/Control/Control").target_revision = target_rev.text
 
 func _on_threads_changed(new_text):
 	print(new_text)

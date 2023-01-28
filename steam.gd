@@ -64,6 +64,7 @@ func check_tf2_sdk_exists():
 			
 
 func check_disk_space(path):
+	return true
 	if OS.get_name() == "X11":
 		print("getting disk space...")
 		var cmdstring = "df -PT | awk '{ if (NR!=1) {print $5, $7}}'"

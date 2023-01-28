@@ -96,7 +96,6 @@ codename \"pinnacle\""
 align = 2
 
 [node name="Label4" type="Label" parent="LoaderUI"]
-visible = false
 margin_left = 13.0
 margin_top = 577.0
 margin_right = 429.0

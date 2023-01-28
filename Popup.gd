@@ -3,7 +3,7 @@ extends WindowDialog
 var val
 signal tpressed
 var text
-var original_size = rect_size.y
+onready var original_size = rect_size.y
 func init(text,input,cont):
 	$VBoxContainer/Label.text = text
 	call_deferred("resize")
