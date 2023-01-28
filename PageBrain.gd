@@ -33,7 +33,8 @@ func html2bbcode(pageText):
 	while z != -1:
 		var tmp = pageText.substr(z)
 		var tag = pageText.substr(z,tmp.find(">")+1)
-		var url = tag.substr(tag.find("href=\"")+6,tag.find_last("\""))
+		var len_of_url = (tag.find_last("\"")) - (tag.find("href=\"")+6)
+		var url = tag.substr(tag.find("href=\"")+6,len_of_url)
 		pageText = pageText.replace(tag,"[url=" + url +"]")
 		z = pageText.find("<a")
 	pageText = pageText.replace("</a>","[/url]")
@@ -223,3 +224,11 @@ func _process(_delta):
 	pass
 	
 
+
+
+func _on_link_clicked(meta):
+	meta = str(meta)
+	if meta.begins_with("http"):
+		OS.shell_open(str(meta))
+	else:
+		OS.shell_open("https://openfortress.fun" + str(meta))

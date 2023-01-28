@@ -1,10 +1,5 @@
 extends Spatial
 
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
-
 var spin = true
 var tween
 

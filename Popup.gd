@@ -5,6 +5,7 @@ signal tpressed
 var text
 var textlen = 0
 onready var original_size = rect_size.y
+
 func init(text,input,cont):
 	$VBoxContainer/Label.text = text
 	call_deferred("resize")

@@ -63,22 +63,24 @@ margin_bottom = 40.0
 script = ExtResource( 8 )
 
 [node name="templabel" type="Label" parent="."]
-margin_left = 666.0
-margin_top = 15.0
-margin_right = 1236.0
-margin_bottom = 105.0
+margin_left = 528.0
+margin_top = 24.0
+margin_right = 1408.0
+margin_bottom = 114.0
 custom_fonts/font = SubResource( 5 )
 text = "LATEST FROM THE BLOG:"
+align = 1
 script = ExtResource( 10 )
 
 [node name="advlabel" type="Label" parent="."]
-margin_left = 666.0
-margin_top = 16.0
-margin_right = 1181.0
-margin_bottom = 128.0
+margin_left = 528.0
+margin_top = 24.0
+margin_right = 1412.0
+margin_bottom = 136.0
 theme = ExtResource( 6 )
 custom_fonts/font = SubResource( 5 )
 text = "ADVANCED OPTIONS"
+align = 1
 script = ExtResource( 10 )
 
 [node name="Music" type="AudioStreamPlayer" parent="."]
@@ -295,6 +297,7 @@ texture_normal = ExtResource( 15 )
 expand = true
 
 [node name="Popup1" parent="." instance=ExtResource( 4 )]
+visible = false
 anchor_top = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0

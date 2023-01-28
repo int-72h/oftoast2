@@ -81,3 +81,7 @@ rect_clip_content = false
 custom_styles/normal = SubResource( 2 )
 bbcode_enabled = true
 fit_content_height = true
+
+[connection signal="meta_clicked" from="PageViewer/RichTextLabel" to="." method="_on_link_clicked"]
+[connection signal="meta_clicked" from="PageViewer2/RichTextLabel" to="." method="_on_link_clicked"]
+[connection signal="meta_clicked" from="PageViewer3/RichTextLabel" to="." method="_on_link_clicked"]

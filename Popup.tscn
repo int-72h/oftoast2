@@ -114,6 +114,10 @@ text = "Use Input"
 margin_top = 230.0
 margin_right = 656.0
 margin_bottom = 264.0
+align = 1
+placeholder_text = "Input corrected thing here!"
+caret_blink = true
+caret_blink_speed = 0.28
 
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Button" to="." method="_on_Button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Button3" to="." method="_on_Button3_pressed"]

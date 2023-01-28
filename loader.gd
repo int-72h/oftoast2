@@ -13,9 +13,7 @@ var thread_done = false
 signal error_handled
 var error_result
 var error_input
-# Called when the node enters the scene tree for the first time.
 
-		
 		
 func _ready():
 	if gd == null:

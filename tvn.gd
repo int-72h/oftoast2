@@ -15,8 +15,6 @@ const TYPE_MKDIR = 1
 func _ready():
 	key_obj.load("res://assets/pubkey.pub",true)
 
-
-
 func replay_changes(changesets):
 	var cumlmap = {}
 	if changesets == null:
@@ -55,7 +53,7 @@ func get_installed_revision(dir):
 	var file = File.new() 
 	var error = file.open(dir + '/.revision', File.READ)
 	if error != OK:
-		return FAIL
+		return -1
 	else:
 		return int(file.get_as_text())
 
@@ -63,7 +61,7 @@ func check_partial_download(dir):
 	var file = File.new() 
 	var error = file.open(dir + "/.dl_started", File.READ)
 	if error != OK:
-		return FAIL
+		return -1
 	else:
 		return int(file.get_as_text())
 

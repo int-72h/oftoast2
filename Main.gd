@@ -24,11 +24,11 @@ var done_threads = 0
 var done_threads_arr = []
 var failed_files = []
 var dl_array = []
-var threads: int = 8
+var threads = OS.get_processor_count()
 var delim = ""
 var changes
 var installed_revision
-var max_threads
+var max_threads = 72
 var latest_rev
 var path
 var url
@@ -69,8 +69,6 @@ func thing():
 		installed_revision = tvn.get_installed_revision(path)  # see if anythings already where we're downloading
 		print("installed revision: " + str(installed_revision))
 		$AdvancedPanel.inst_dir.text = path
-	max_threads = int(gd.download_to_string(url + "/reithreads")) # this will fail, verify
-	threads = max_threads
 	latest_rev = gd.download_to_string(url + "/revisions/latest")
 	if gd.get_error() != OK:
 		error_handler(
@@ -80,13 +78,14 @@ func thing():
 		if error_result == RETRY:
 			return thing()
 	var tmp = do_stuff()
+	print(str(threads) + " threads")
 	if typeof(tmp) == TYPE_OBJECT:
 		yield(tmp,"completed")
 	threads = int(threads)
 	latest_rev = int(latest_rev)
 	$AdvancedPanel.threads.text = str(threads)
 	target_revision = latest_rev
-	$VBoxContainer2/Label.text = "INSTALLED: " + str(latest_rev)
+	$VBoxContainer2/Label.text = "INSTALLED: " + str(installed_revision)
 	$VBoxContainer2/Label2.text = "LATEST: " + str(latest_rev)
 	if installed_revision == latest_rev:
 		$VBoxContainer/Update.disabled = true
@@ -117,6 +116,7 @@ func start(verify = false):
 		if verify:
 			$VBoxContainer3/Label2.text = "Verifying..."
 			installed_revision = -1
+			do_stuff()
 		$VBoxContainer3/ProgressBar.max_value = len(dl_array)
 		$VBoxContainer3/ProgressBar.value = 0
 		for x in filter(tvn.TYPE_DELETE, changes):
@@ -130,20 +130,19 @@ func start(verify = false):
 			error = dir.make_dir_recursive(path + delim + x["path"])
 			if error != OK and (error != 20):
 				print_debug("CRITICAL: can't write ")
-		error = dir.remove(path + "/.revision")  # godot file/dir api consistently uses unix path seperators - GDNATIVE API DOESN'T?!
-		if error != OK:
-			print_debug("no .revision, ok....")
-		var file = File.new()
-		error = file.open(path + "/.dl_started", File.WRITE)  # allows us to check for partial dls
-		if error != OK:
-			error_handler(
-				"can't write dl_started file... this is a non-issue really, but could be a sign for worse things. Press the continue button to continue."
-			)
-			yield(self, "error_handled")
-		file.store_string(str(latest_rev))
-		file.close()
-		$VBoxContainer3/ProgressBar.max_value = len(dl_array)
 		if verify == false:
+			error = dir.remove(path + "/.revision")  # godot file/dir api consistently uses unix path seperators - GDNATIVE API DOESN'T?!
+			if error != OK:
+				print_debug("no .revision, ok....")
+			var file = File.new()
+			error = file.open(path + "/.dl_started", File.WRITE)  # allows us to check for partial dls
+			if error != OK:
+				error_handler(
+					"can't write dl_started file... this is a non-issue really, but could be a sign for worse things. Press the continue button to continue."
+				)
+				yield(self, "error_handled")
+			file.store_string(str(latest_rev))
+			file.close()
 			work()
 		else:
 			verify()
@@ -296,6 +295,7 @@ func _on_Advanced_pressed():
 	var transition = Tween.TRANS_BACK
 	var easeing = Tween.EASE_IN_OUT
 	var time = 0.75
+	$AdvancedPanel/MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Threads/Text.text = str(threads)
 	if !$AdvancedPanel.visible:
 		$VBoxContainer/Update.disabled = true
 		$VBoxContainer/Verify.disabled = true
@@ -309,7 +309,7 @@ func _on_Advanced_pressed():
 			easeing
 		)
 		#yield(get_tree().create_timer(0.1),"timeout")
-		tween.tween_property($advlabel, "rect_position", Vector2(666, 16), time).set_trans(transition).set_ease(
+		tween.tween_property($advlabel, "rect_position", Vector2(528, 24), time).set_trans(transition).set_ease(
 			easeing
 		)
 		tween.tween_property($VBoxContainer3/BlogPanel, "modulate", Color.transparent, time).set_trans(transition).set_ease(
@@ -361,23 +361,6 @@ func check_settings(): # this is awful rewrite at some point
 #					return check_settings()
 #			RETRY:
 #				return check_settings()
-	if not user_threads.is_valid_integer() or int(user_threads) > max_threads or int(user_threads) < 1:
-			error_handler("invalid thread count, must be greater than 1 or smaller than " + str(max_threads),true,false)
-			yield(self,"error_handled")
-			match error_result:
-				INPUT:
-					print_debug(error_input)
-					if error_input.is_valid_integer():
-						print("OK")
-						$AdvancedPanel.threads.text = error_input
-						threads = int(error_input)
-					else:
-						return check_settings()
-				RETRY:
-					return check_settings()
-	else:
-		print("OK")
-		threads = int(user_threads)
 #	if not check_install_path(path):
 #		error_handler("Invalid path. Maybe you haven't got enough space idk.",true,false)
 #		yield(self,"error_handled")
