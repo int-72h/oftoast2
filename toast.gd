@@ -36,6 +36,7 @@ func stop():
 	tween = get_tree().create_tween().set_parallel(true)
 	tween.tween_property(self,"rect_rotation",rect_rotation + (360 - (int(rect_rotation) % 360)),2).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
 	tween.tween_property(self,"modulate",Color.white,2)
+	spin = true
 
 func switch():
 	tween.stop()

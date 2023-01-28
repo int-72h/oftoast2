@@ -16,6 +16,7 @@ const TVN = preload("res://tvn.gd")
 var music = preload("res://assets/toast.wav")
 var start_music = preload("res://assets/start.wav")
 var done = preload("res://assets/done.wav")
+var user_threads
 var revisions = []
 var arr_of_threads = []
 var downloading
@@ -78,13 +79,17 @@ func thing():
 		yield(self, "error_handled")
 		if error_result == RETRY:
 			return thing()
+	var tmp = do_stuff()
+	if typeof(tmp) == TYPE_OBJECT:
+		yield(tmp,"completed")
 	threads = int(threads)
 	latest_rev = int(latest_rev)
 	$AdvancedPanel.threads.text = str(threads)
 	target_revision = latest_rev
-	$AdvancedPanel.target_rev.text = str(latest_rev)
 	$VBoxContainer2/Label.text = "INSTALLED: " + str(latest_rev)
 	$VBoxContainer2/Label2.text = "LATEST: " + str(latest_rev)
+	if installed_revision == latest_rev:
+		$VBoxContainer/Update.disabled = true
 	emit_signal("draw")
 
 
@@ -157,7 +162,6 @@ func start(verify = false):
 	$VBoxContainer3/ProgressBar.hide()
 	$VBoxContainer3/ProgressBar.value = 0
 	$VBoxContainer3/Label2.hide()
-	$VBoxContainer/Update.disabled = false
 	$VBoxContainer/Verify.disabled = false
 
 
@@ -282,11 +286,8 @@ func error_handler(error, input = false,cont=true):
 	$Popup1.popup()
 	yield($Popup1, "tpressed")
 	error_result = $Popup1.val
-	if input and $Popup1.val == INPUT:
-		if $Popup1.text == null:
-			error_result = RETRY
-		else:
-			error_input = $Popup1.text 
+	if error_result == INPUT:
+		error_input = $Popup1.text
 	emit_signal("error_handled")
 
 
@@ -327,7 +328,7 @@ func _on_Advanced_pressed():
 		var z = check_settings()
 		if typeof(z) == TYPE_OBJECT:
 			yield(z,"completed")
-			yield(self,"settings_ok")
+		print_debug(z)
 		var tween = get_tree().create_tween().set_parallel(true)
 		tween.tween_property($AdvancedPanel, "rect_position", Vector2(-900, 150), time).set_trans(transition).set_ease(
 			easeing
@@ -360,29 +361,35 @@ func check_settings(): # this is awful rewrite at some point
 #					return check_settings()
 #			RETRY:
 #				return check_settings()
-	if threads > int(max_threads) or threads < 1:
-		error_handler("invalid thread count, must be greater than 1 or smaller than " + str(max_threads),true,false)
-		yield(self,"error_handled")
-		match error_result:
-			INPUT:
-				if error_input.is_valid_integer():
-					threads = int(error_input)
-				else:
+	if not user_threads.is_valid_integer() or int(user_threads) > max_threads or int(user_threads) < 1:
+			error_handler("invalid thread count, must be greater than 1 or smaller than " + str(max_threads),true,false)
+			yield(self,"error_handled")
+			match error_result:
+				INPUT:
+					print_debug(error_input)
+					if error_input.is_valid_integer():
+						print("OK")
+						$AdvancedPanel.threads.text = error_input
+						threads = int(error_input)
+					else:
+						return check_settings()
+				RETRY:
 					return check_settings()
-			RETRY:
-				return check_settings()
-	if not check_install_path(path):
-		error_handler("Invalid path. Maybe you haven't got enough space idk.",true,false)
-		yield(self,"error_handled")
-		match error_result:
-			INPUT:
-				if check_install_path(error_input):
-					path = error_input
-				else:
-					return check_settings()
-			RETRY:
-				return check_settings()
-	emit_signal("settings_ok")
+	else:
+		print("OK")
+		threads = int(user_threads)
+#	if not check_install_path(path):
+#		error_handler("Invalid path. Maybe you haven't got enough space idk.",true,false)
+#		yield(self,"error_handled")
+#		match error_result:
+#			INPUT:
+#				if check_install_path(error_input):
+#					path = error_input
+#				else:
+#					return check_settings()
+#			RETRY:
+#				return check_settings()
+	return true
 	
 
 
@@ -414,11 +421,6 @@ func _throw_error():  # throws an error
 	error_handler("ERROR TEST... LOVELY")
 	yield(self, "error_handled")
 	print("this should print after the error has been handled")
-
-
-func _on_error_handled():
-	if error_result == HCF:
-		get_tree().quit()
 
 
 func _process(_delta):

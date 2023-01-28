@@ -221,9 +221,9 @@ size_flags_vertical = 3
 
 [node name="HSeparator2" type="HSeparator" parent="VBoxContainer3"]
 visible = false
-margin_top = 872.0
+margin_top = 932.0
 margin_right = 884.0
-margin_bottom = 876.0
+margin_bottom = 936.0
 
 [node name="Label" type="Label" parent="VBoxContainer3"]
 visible = false
@@ -295,7 +295,6 @@ texture_normal = ExtResource( 15 )
 expand = true
 
 [node name="Popup1" parent="." instance=ExtResource( 4 )]
-visible = false
 anchor_top = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0

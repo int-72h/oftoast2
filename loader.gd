@@ -19,17 +19,8 @@ var error_input
 		
 func _ready():
 	if gd == null:
-		var dir = Directory.new()
-		print(OS.get_name())
-		if OS.get_name() == "X11":
-			dir.copy("res://libgddl.so",OS.get_executable_path().get_base_dir() + "/libgddl.so")
-		else:
-			var z = dir.copy("res://libgddl.dll",OS.get_executable_path().get_base_dir().plus_file("libgddl.dll"))
-			if z != OK:
-				print("??????? something's gone wrong are you on wine")
-				get_tree().quit()
-		OS.execute(OS.get_executable_path(),[],false)
-		yield(get_tree().create_timer(5),"timeout")
+		error_handler("DLL/SO not found!",false,false)
+		yield(self,"error_handled")
 		get_tree().quit()
 #	var newver = gd.download_to_string("/latest_launcher_ver")  ## commented out for now as it hasn't been implemented serverside yet, but it does work
 #	if newver > version:
@@ -87,5 +78,5 @@ func error_handler(error,input=false,cont=true):
 	error_result = $Popup1.val
 	emit_signal("error_handled")
 	if input:
-		error_input = $Popup1.text
-
+		if $Popup1.text != null:
+			error_input = $Popup1.text

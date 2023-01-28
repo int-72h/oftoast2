@@ -21,7 +21,7 @@ func _ready():
 
 func _on_threads_changed(new_text):
 	print(new_text)
-	get_node("/root/Control/Control").threads = threads.text
+	get_node("/root/Control/Control").user_threads = threads.text
 
 
 func _on_maxdl_changed(new_text):
