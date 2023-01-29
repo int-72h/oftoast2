@@ -107,7 +107,8 @@ func start(verify = false, dozip=true):
 	emit_signal("started")
 	var dir = Directory.new()
 	var error
-	if tvn.check_partial_download(path) != tvn.FAIL:
+
+	if tvn.check_partial_download(path) > 0:
 		verify = true
 #	if installed_revision == -1 and verify == false and dozip == true:  # the zip thing
 #		pass
