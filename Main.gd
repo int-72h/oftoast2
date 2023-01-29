@@ -50,7 +50,7 @@ func _ready():
 	$AdvancedPanel.rect_position = Vector2(-800, 150)
 	
 func thing():
-	url = "https://toast.openfortress.fun/toast/"
+	url = "https://toast.openfortress.fun/toast/" # use mirrors idk
 	var gd = GDDL.new()
 	if OS.get_name() == "X11":
 		delim = "/"
@@ -69,6 +69,7 @@ func thing():
 		installed_revision = tvn.get_installed_revision(path)  # see if anythings already where we're downloading
 		print("installed revision: " + str(installed_revision))
 		$AdvancedPanel.inst_dir.text = path
+		$FileDialog.current_path = path
 	latest_rev = gd.download_to_string(url + "/revisions/latest")
 	if gd.get_error() != OK:
 		error_handler(
@@ -78,21 +79,22 @@ func thing():
 		if error_result == RETRY:
 			return thing()
 	var tmp = do_stuff()
-	print(str(threads) + " threads")
 	if typeof(tmp) == TYPE_OBJECT:
 		yield(tmp,"completed")
-	threads = int(threads)
 	latest_rev = int(latest_rev)
-	$AdvancedPanel.threads.text = str(threads)
 	target_revision = latest_rev
-	$VBoxContainer2/Label.text = "INSTALLED: " + str(installed_revision)
+	$AdvancedPanel.threads.text = str(threads)
+	if installed_revision == -1:
+		$VBoxContainer2/Label.text = "NOT INSTALLED!"
+	else:
+		$VBoxContainer2/Label.text = "INSTALLED: " + str(installed_revision)
 	$VBoxContainer2/Label2.text = "LATEST: " + str(latest_rev)
 	if installed_revision == latest_rev:
 		$VBoxContainer/Update.disabled = true
 	emit_signal("draw")
 
 
-func start(verify = false):
+func start(verify = false, dozip=true):
 	$VBoxContainer3/Label2.text = "Downloading..."
 	$VBoxContainer3/Label2.show()
 	$VBoxContainer3/ProgressBar.show()
@@ -107,12 +109,13 @@ func start(verify = false):
 	var error
 	if tvn.check_partial_download(path) != tvn.FAIL:
 		verify = true
-	if installed_revision == -1 and verify == false:  # the zip thing
-		pass
+#	if installed_revision == -1 and verify == false and dozip == true:  # the zip thing
+#		pass
+		#$VBoxContainer3/Label2.text = "Using Advanced Compressed Archival Technology™..."
 		#var t = Thread.new()
 		#arr_of_threads.append(t)
 		#arr_of_threads[0].start(self,"_dozip",["",path]) ## no url as it hasn't been implemented serverside yet
-	else:
+	#else:
 		if verify:
 			$VBoxContainer3/Label2.text = "Verifying..."
 			installed_revision = -1
@@ -158,6 +161,8 @@ func start(verify = false):
 	$SFX.stream = done
 	$SFX.play()
 	$Music.stop()
+	installed_revision = latest_rev
+	$VBoxContainer2/Label.text = "INSTALLED: " + str(latest_rev)
 	$VBoxContainer3/ProgressBar.hide()
 	$VBoxContainer3/ProgressBar.value = 0
 	$VBoxContainer3/Label2.hide()
@@ -259,6 +264,8 @@ func verify():
 
 
 func _verify():
+	if dl_array == []:
+		print("huh?")
 	var redl_array = []
 	var file = File.new()
 	for dl in dl_array:
@@ -268,8 +275,11 @@ func _verify():
 			redl_array.append(dl)
 		else:
 			emit_signal("file_done")
+	$VBoxContainer3/ProgressBar.value = 0
 	if redl_array == []:
 		emit_signal("all_done")
+	elif len(redl_array) == len(dl_array):
+		start(false,true)
 	else:
 		dl_array = redl_array
 		$VBoxContainer3/Label2.text = "Redownloading " + str(len(dl_array)) + " files"
@@ -345,22 +355,12 @@ func _on_Advanced_pressed():
 		yield(get_tree().create_timer(0.5), "timeout")
 		$AdvancedPanel.visible = !$AdvancedPanel.visible
 		$VBoxContainer/Advanced.disabled = false
-		$VBoxContainer/Update.disabled = false
+		if installed_revision != latest_rev:
+			$VBoxContainer/Update.disabled = false
 		$VBoxContainer/Verify.disabled = false
 
 
 func check_settings(): # this is awful rewrite at some point
-#	if target_revision > latest_rev or target_revision < 0 or target:
-#		error_handler("invalid revision",true,false)
-#		yield(self,"error_handled")
-#		match error_result:
-#			INPUT:
-#				if error_input.is_valid_integer():
-#					target_revision = int(error_input)
-#				else:
-#					return check_settings()
-#			RETRY:
-#				return check_settings()
 #	if not check_install_path(path):
 #		error_handler("Invalid path. Maybe you haven't got enough space idk.",true,false)
 #		yield(self,"error_handled")
@@ -372,6 +372,14 @@ func check_settings(): # this is awful rewrite at some point
 #					return check_settings()
 #			RETRY:
 #				return check_settings()
+	installed_revision = tvn.get_installed_revision(path)  # see if anythings already where we're downloading
+	print("new installed revision: " + str(installed_revision))
+	$AdvancedPanel.inst_dir.text = path
+	$FileDialog.current_path = path
+	if installed_revision == -1:
+		$VBoxContainer2/Label.text = "NOT INSTALLED!"
+	else:
+		$VBoxContainer2/Label.text = "INSTALLED: " + str(installed_revision)
 	return true
 	
 
@@ -414,6 +422,8 @@ func _process(_delta):
 		done_threads_arr = []
 	if done_threads == int(threads):
 		emit_signal("all_done")
+		done_threads = 0
+		done_threads_arr = []
 
 
 func _on_AdvancedPanel_picker_open():

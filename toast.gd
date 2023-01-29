@@ -5,12 +5,14 @@ var spin = true
 var in_main = false
 
 func _on_main_spin_start():
+	print("starting spinning")
 	if spin == true:
 		tween = get_tree().create_tween()
 		tween.connect("finished",self,"_on_main_spin_start")
 		tween.tween_property(self,"rect_rotation",rect_rotation + 360,3)
 	
 func _on_main_spin_stop():
+	print_debug("stopping the speen")
 	spin = false
 	tween.stop()
 	tween = get_tree().create_tween().set_parallel(true)

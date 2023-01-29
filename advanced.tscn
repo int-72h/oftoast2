@@ -129,8 +129,26 @@ margin_bottom = 63.0
 custom_fonts/font = SubResource( 12 )
 text = "Launcher settings"
 
-[node name="LauncherContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
+[node name="Threads" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
 margin_top = 63.0
+margin_right = 755.0
+margin_bottom = 117.0
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/Threads"]
+margin_right = 755.0
+margin_bottom = 34.0
+text = "Volume Slider"
+
+[node name="HSlider" type="HSlider" parent="MarginContainer/VBoxContainer/Threads"]
+margin_top = 38.0
+margin_right = 755.0
+margin_bottom = 54.0
+min_value = -50.0
+max_value = 50.0
+value = 1.0
+
+[node name="LauncherContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
+margin_top = 117.0
 margin_right = 755.0
 margin_bottom = 1011.0
 size_flags_horizontal = 3
@@ -142,7 +160,7 @@ custom_constants/margin_bottom = 4
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/LauncherContainer"]
 margin_left = 4.0
 margin_right = 747.0
-margin_bottom = 944.0
+margin_bottom = 890.0
 
 [node name="Threads" type="VBoxContainer" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer"]
 margin_right = 743.0
@@ -203,7 +221,7 @@ text = "Choose Path"
 [node name="Mirrors" type="VBoxContainer" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer"]
 margin_top = 152.0
 margin_right = 743.0
-margin_bottom = 944.0
+margin_bottom = 890.0
 size_flags_vertical = 3
 
 [node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Mirrors"]
@@ -214,11 +232,14 @@ text = "Mirrors (each mirror on a new line)"
 [node name="Text" type="TextEdit" parent="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Mirrors"]
 margin_top = 38.0
 margin_right = 743.0
-margin_bottom = 792.0
+margin_bottom = 738.0
 rect_min_size = Vector2( 0, 35 )
 size_flags_vertical = 3
 theme = SubResource( 11 )
+custom_colors/caret_color = Color( 0.239216, 0.160784, 0.317647, 1 )
 text = "this is where the path GOES"
+caret_blink = true
+caret_blink_speed = 0.44
 
 [node name="HSeparator4" type="HSeparator" parent="MarginContainer/VBoxContainer"]
 margin_top = 1011.0
@@ -226,6 +247,7 @@ margin_right = 755.0
 margin_bottom = 1015.0
 
 [connection signal="text_changed" from="MarginContainer/VBoxContainer/VersionContainer/Revision/Text" to="." method="_on_revision_changed"]
+[connection signal="value_changed" from="MarginContainer/VBoxContainer/Threads/HSlider" to="." method="_on_HSlider_value_changed"]
 [connection signal="text_changed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Threads/Text" to="." method="_on_threads_changed"]
 [connection signal="text_changed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/MaxDLSpeed/Text" to="." method="_on_maxdl_changed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/InstallDir/Button" to="." method="_on_Button_pressed"]

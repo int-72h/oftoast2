@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=2]
+[gd_scene load_steps=25 format=2]
 
 [ext_resource path="res://assets/previous.png" type="Texture" id=1]
 [ext_resource path="res://Oswald-Medium.ttf" type="DynamicFontData" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://Popup.tscn" type="PackedScene" id=4]
 [ext_resource path="res://assets/up.png" type="Texture" id=5]
 [ext_resource path="res://ui_theme.tres" type="Theme" id=6]
+[ext_resource path="res://assets/toast.wav" type="AudioStream" id=7]
 [ext_resource path="res://steam.gd" type="Script" id=8]
 [ext_resource path="res://PageBrain.tscn" type="PackedScene" id=9]
 [ext_resource path="res://templabel.gd" type="Script" id=10]
@@ -84,6 +85,7 @@ align = 1
 script = ExtResource( 10 )
 
 [node name="Music" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 7 )
 volume_db = -80.0
 
 [node name="SFX" type="AudioStreamPlayer" parent="."]
