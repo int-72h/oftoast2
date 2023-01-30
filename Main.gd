@@ -52,12 +52,12 @@ func _ready():
 func thing():
 	url = "https://toast.openfortress.fun/toast/" # use mirrors idk
 	var gd = GDDL.new()
-	if OS.get_name() == "X11":
+	if OS.get_name() == "X11": # do we need this?
 		delim = "/"
 	else:
 		delim = "\\"
-	steam.get_of_path()
-	steam.check_tf2_sdk_exists()
+	steam.get_of_path() # this doesn't get the of path if it exists, it gets where of *should* be!
+	steam.check_tf2_sdk_exists() # what it says on the tin
 	path = steam.of_dir
 	print(path)
 	if path == null:
@@ -73,7 +73,7 @@ func thing():
 	latest_rev = gd.download_to_string(url + "/revisions/latest")
 	if gd.get_error() != OK:
 		error_handler(
-			"Downloading target threads and/or latest revision failed:\n" + str(gd.get_error())
+			"Downloading latest revision failed:\n" + str(gd.get_error())
 		)
 		yield(self, "error_handled")
 		if error_result == RETRY:
@@ -94,7 +94,7 @@ func thing():
 	emit_signal("draw")
 
 
-func start(verify = false, dozip=true):
+func start(verify = false, dozip=true): # this does all the setup before the downloading such as creating folders, UI, etc
 	$VBoxContainer3/Label2.text = "Downloading..."
 	$VBoxContainer3/Label2.show()
 	$VBoxContainer3/ProgressBar.show()
@@ -177,7 +177,7 @@ func _dozip(arr):
 	var ziploc = ProjectSettings.globalize_path("user://latest.zip")
 	var error = tvn.download_file(url, ziploc)
 	if error != tvn.OK:
-		error_handler("failed to download zip: " + error,false,false)
+		error_handler("failed to download zip: " + error,false,false) # more error handling
 		yield(self, "error_handled")
 		match error_result:
 			RETRY:
@@ -188,22 +188,22 @@ func _dozip(arr):
 		error_handler("failed to unzip!")
 		yield(self, "error_handled")
 	var f = Directory.new()
-	f.remove(ziploc)  ## delete zipx
+	f.remove(ziploc)  ## delete zip
 	done_threads_arr.append(0)
 
-func work():
+func work(): # this starts all the threads
 	for x in range(0, threads):
 		var t = Thread.new()
 		arr_of_threads.append(t)
 		arr_of_threads[x].start(self, "_work", x)
 	print_debug("threads started")
 
-func _work(arr):
+func _work(arr): # function that's launched by the threads
 	var thread_no = arr
 	print("hello from thread " + str(thread_no))
 	var all_dls_done = false
 	while !all_dls_done:
-		mut.lock()
+		mut.lock() # mutex locked single list
 		if len(dl_array) == 0:
 			mut.unlock()
 			all_dls_done = true
@@ -216,7 +216,7 @@ func _work(arr):
 			var path = dl[1]
 			var url = dl[0]
 			if not dl_object.download_file(url, path):
-				mut.lock()
+				mut.lock() # this stops any downloading whilst the errors being handled
 				print("uh oh.")
 				error_handler(dl_object.get_detailed_error() + " Path: " + path + "\n url: " + url)
 				yield(self, "error_handled")
@@ -242,18 +242,18 @@ func filter(type, candidate_array):  # used for tvn shenanigans
 			filtered_array.append(candidate_value)
 	return filtered_array
 
-func do_stuff():
+func do_stuff(): # fetches the revisions, gets the list of changes and writes
 	revisions = tvn.fetch_revisions(url, -1, int(latest_rev), false)  # returns an error string otherwise
-	if typeof(revisions) != TYPE_ARRAY:
+	if typeof(revisions) != TYPE_ARRAY: # error handling
 		error_handler(("Error fetching revisions: "+ revisions),false,false)
 		yield(self, "error_handled")
 		if error_result == RETRY or error_result == CONTINUE:
 			return thing()
 		return
 	changes = tvn.replay_changes(revisions)
-	writes = filter(tvn.TYPE_WRITE, changes)
+	writes = filter(tvn.TYPE_WRITE, changes) # we only want the writes
 	for x in writes:
-		dl_array.append([url + "objects/" + x["object"], path + delim + x["path"], x["hash"]])
+		dl_array.append([url + "objects/" + x["object"], path + delim + x["path"], x["hash"]]) # format for the dlarray is [[url,path,hash]...]
 	print("stuff done")
 
 
@@ -302,11 +302,10 @@ func error_handler(error, input = false,cont=true):
 
 
 func _on_Advanced_pressed():
-	print($VBoxContainer/Advanced.disabled)
 	var transition = Tween.TRANS_BACK
 	var easeing = Tween.EASE_IN_OUT
 	var time = 0.75
-	$AdvancedPanel/MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Threads/Text.text = str(threads)
+	$AdvancedPanel/MarginContainer/VBoxContainer/LauncherContainer/VBoxContainer/Threads/Text.text = str(threads) # set the current threads to the advanced ui
 	if !$AdvancedPanel.visible:
 		$VBoxContainer/Update.disabled = true
 		$VBoxContainer/Verify.disabled = true
@@ -361,7 +360,7 @@ func _on_Advanced_pressed():
 		$VBoxContainer/Verify.disabled = false
 
 
-func check_settings(): # this is awful rewrite at some point
+func check_settings(): # this executes anything that needs to be done after a setting has changed.
 #	if not check_install_path(path):
 #		error_handler("Invalid path. Maybe you haven't got enough space idk.",true,false)
 #		yield(self,"error_handled")
@@ -415,7 +414,7 @@ func _throw_error():  # throws an error
 	print("this should print after the error has been handled")
 
 
-func _process(_delta):
+func _process(_delta): # this is the thread culler - it checks if any threads are done then waits for them to finish
 	if len(done_threads_arr) > 0:
 		for t in done_threads_arr:
 			arr_of_threads[t].wait_to_finish()

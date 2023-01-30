@@ -30,12 +30,12 @@ func _ready():
 #			OS.execute("/bin/bash",["-c",cmd_str])
 		
 	#get_tree().change_scene("res://Main.tscn")
-	var dl_object = GDDL.new()
-	assert(dl_object != null)
+	var dl_object = GDDL.new() #initialise gddl 
+	assert(dl_object != null) # huh?
 	print(dl_object)
-	var response = dl_object.download_to_string(default_url+"/reithreads")
+	var response = dl_object.download_to_string(default_url+"/reithreads") # just to test
 	print(response)
-	if dl_object.get_error() != OK:
+	if dl_object.get_error() != OK: # well the test failed
 		error_handler("Default URL invalid, or the internets down. Please check your connection first. Either:\nQuit.\nTry Again.\nInput another valid URL.\nDetailed error for nerds:\n" + str(dl_object.get_detailed_error()),true,false)
 		yield(self,"error_handled")
 		match error_result:
@@ -45,21 +45,21 @@ func _ready():
 				get_tree().quit()
 			INPUT:
 				default_url = error_input
-	yield(get_tree().create_timer(3),"timeout")
+	yield(get_tree().create_timer(3),"timeout") # just for now, we're going to be doing other stuff soon
 	$ViewportContainer/Viewport/Spatial.stop()
 	$TextureRect.stop()
-	yield(get_tree().create_timer(2),"timeout")
-	mainn = main.instance()
-	add_child(mainn)
-	yield(mainn,"draw")
-	$Control.modulate = Color.transparent
+	yield(get_tree().create_timer(2),"timeout") # to allow the transition
+	mainn = main.instance() # instance the main scene... this will call _init()
+	add_child(mainn) # add it! this will call _ready()
+	yield(mainn,"draw") # we wait for it to all chug through
+	$Control.modulate = Color.transparent # make the main scene transparent
 	var tween = get_tree().create_tween().set_parallel()
-	tween.tween_property($LoaderUI,"modulate",Color.transparent,1.5)
+	tween.tween_property($LoaderUI,"modulate",Color.transparent,1.5) # tween the two together
 	tween.tween_property($Control,"modulate",Color.white,1.5)
 	#$Control/Icon.visible = false
 	$TextureRect.call("switch")
 	yield(get_tree().create_timer(1.5),"timeout")
-	$Control.connect("started",$TextureRect,"_on_main_spin_start")
+	$Control.connect("started",$TextureRect,"_on_main_spin_start") # hook up the toast to the main stuff
 	$Control.connect("all_done",$TextureRect,"_on_main_spin_stop")
 	$TextureRect.in_main = true
 	#$Control/Icon.visible = true
