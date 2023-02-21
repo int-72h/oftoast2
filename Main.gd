@@ -50,39 +50,52 @@ func _ready():
 	$AdvancedPanel.rect_position = Vector2(-800, 150)
 	
 func thing():
-	url = "https://toast.openfortress.fun/toast/" # use mirrors idk
+	url = "https://toastware.org/toast/" # use mirrors idk
 	var gd = GDDL.new()
 	if OS.get_name() == "X11":
 		delim = "/"
 	else:
 		delim = "\\"
-	steam.get_of_path()
-	steam.check_tf2_sdk_exists()
-	path = steam.of_dir
-	print(path)
-	if path == null:
-		$VBoxContainer/Update.disabled = true
-		$VBoxContainer/Verify.disabled = true
-		installed_revision = -1
-		#do thingy here to get path.
+	var of_status = steam.get_of_path()
+	if of_status != 0:
+		if path == null:
+			$VBoxContainer/Update.disabled = true
+			$VBoxContainer/Verify.disabled = true
+			installed_revision = -1
+		if of_status == 1:
+			steam.check_tf2_sdk_exists()
 	else:
+		path = steam.of_dir
+		print(path)
 		installed_revision = tvn.get_installed_revision(path)  # see if anythings already where we're downloading
 		print("installed revision: " + str(installed_revision))
 		$AdvancedPanel.inst_dir.text = path
 		$FileDialog.current_path = path
 	latest_rev = gd.download_to_string(url + "/revisions/latest")
+	var correct = false
+	print(gd.get_error())
+	if gd.get_error() == OK:
+		print("OK!")
+		correct = true
 	if gd.get_error() != OK:
+		print("not ok...")
 		error_handler(
-			"Downloading target threads and/or latest revision failed:\n" + str(gd.get_error())
+			"Downloading target threads and/or latest revision failed:\n" + str(gd.get_detailed_error())
 		)
 		yield(self, "error_handled")
 		if error_result == RETRY:
 			return thing()
+		if error_result == HCF:
+			get_tree().quit()
 	var tmp = do_stuff()
 	if typeof(tmp) == TYPE_OBJECT:
 		yield(tmp,"completed")
+	if correct == false:
+		print("we shouldn't be here... quitting!")
+		get_tree().quit()
 	latest_rev = int(latest_rev)
 	target_revision = latest_rev
+	print(latest_rev)
 	$AdvancedPanel.threads.text = str(threads)
 	if installed_revision == -1:
 		$VBoxContainer2/Label.text = "NOT INSTALLED!"
@@ -109,13 +122,13 @@ func start(verify = false, dozip=true):
 	var error
 	if tvn.check_partial_download(path) != tvn.FAIL:
 		verify = true
-#	if installed_revision == -1 and verify == false and dozip == true:  # the zip thing
-#		pass
-		#$VBoxContainer3/Label2.text = "Using Advanced Compressed Archival Technology™..."
-		#var t = Thread.new()
-		#arr_of_threads.append(t)
-		#arr_of_threads[0].start(self,"_dozip",["",path]) ## no url as it hasn't been implemented serverside yet
-	#else:
+	if installed_revision == -1 and verify == false and dozip == true:  # the zip thing
+		pass
+		$VBoxContainer3/Label2.text = "Using Advanced Compressed Archival Technology™..."
+		var t = Thread.new()
+		arr_of_threads.append(t)
+		arr_of_threads[0].start(self,"_dozip",["https://toastware.org/toast/toastware/open_fortress.zip",path]) ## no url as it hasn't been implemented serverside yet
+	else:
 		if verify:
 			$VBoxContainer3/Label2.text = "Verifying..."
 			installed_revision = -1
@@ -361,17 +374,15 @@ func _on_Advanced_pressed():
 
 
 func check_settings(): # this is awful rewrite at some point
-#	if not check_install_path(path):
-#		error_handler("Invalid path. Maybe you haven't got enough space idk.",true,false)
-#		yield(self,"error_handled")
-#		match error_result:
-#			INPUT:
-#				if check_install_path(error_input):
-#					path = error_input
-#				else:
-#					return check_settings()
-#			RETRY:
-#				return check_settings()
+	if not check_install_path(path):
+		error_handler("Invalid path. Maybe you haven't got enough space idk.",true,false)
+		yield(self,"error_handled")
+		match error_result:
+			INPUT:
+				if check_install_path(error_input):
+					path = error_input
+				else:
+					return check_settings()
 	installed_revision = tvn.get_installed_revision(path)  # see if anythings already where we're downloading
 	print("new installed revision: " + str(installed_revision))
 	$AdvancedPanel.inst_dir.text = path

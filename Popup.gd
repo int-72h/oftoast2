@@ -9,9 +9,9 @@ onready var original_size = rect_size.y
 func init(text,input,cont):
 	$VBoxContainer/Label.text = text
 	call_deferred("resize")
-	if input:
-		$VBoxContainer/HBoxContainer/Button4.show()
-		$VBoxContainer/LineEdit.show()
+	if not input:
+		$VBoxContainer/HBoxContainer/Button4.hide()
+		$VBoxContainer/LineEdit.hide()
 	if not cont:
 		$VBoxContainer/HBoxContainer/Button.hide()
 		$VBoxContainer/HBoxContainer/VSeparator.hide()

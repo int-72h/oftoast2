@@ -29,6 +29,7 @@ func html2bbcode(pageText):
 	pageText = pageText.replace("]]>", "");
 	pageText = pageText.replace("<ins>", "");
 	pageText = pageText.replace("</ins>", "");
+	pageText = pageText.replace("</span>","");
 	var z = pageText.find("<a")
 	while z != -1:
 		var tmp = pageText.substr(z)
@@ -38,6 +39,12 @@ func html2bbcode(pageText):
 		pageText = pageText.replace(tag,"[url=" + url +"]")
 		z = pageText.find("<a")
 	pageText = pageText.replace("</a>","[/url]")
+	z = pageText.find("<span")
+	while z != -1:
+		var tmp = pageText.substr(z)
+		var tag = pageText.substr(z,tmp.find(">")+1)
+		pageText = pageText.replace(tag,"")
+		z = pageText.find("<span")
 	return pageText
 
 

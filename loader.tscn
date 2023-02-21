@@ -47,7 +47,6 @@ texture = ExtResource( 8 )
 stretch_mode = 5
 
 [node name="TextureRect" type="TextureRect" parent="."]
-modulate = Color( 1, 1, 1, 0 )
 margin_left = -333.0
 margin_top = -176.0
 margin_right = 417.0
@@ -133,13 +132,13 @@ text = "2.0"
 [node name="SFX" type="AudioStreamPlayer" parent="."]
 
 [node name="Popup1" parent="." instance=ExtResource( 6 )]
-visible = false
 margin_left = 40.0
 margin_top = -464.0
 margin_right = -715.0
 margin_bottom = -179.0
 
 [node name="ViewportContainer" type="ViewportContainer" parent="."]
+visible = false
 margin_left = -688.0
 margin_top = -536.0
 margin_right = 776.0
@@ -150,6 +149,6 @@ stretch = true
 size = Vector2( 1464, 1480 )
 transparent_bg = true
 handle_input_locally = false
-render_target_update_mode = 3
+render_target_update_mode = 0
 
 [node name="Spatial" parent="ViewportContainer/Viewport" instance=ExtResource( 9 )]

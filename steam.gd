@@ -11,7 +11,7 @@ var of_dir
 
 func get_of_path():
 	if OS.get_name() == "X11":
-		print("this is linux!")
+		print("Linux detected!")
 		var dir = Directory.new()
 		var home_dir = OS.get_data_dir().split("/.local")[0]
 		print(home_dir)
@@ -19,16 +19,14 @@ func get_of_path():
 			steam_dir = home_dir + i
 			of_dir = steam_dir + "/steamapps/sourcemods/open_fortress"
 			if dir.dir_exists(of_dir):
-				print("ja you has the oopen fortress")
-				break
+				print("Open Fortress (folder) detected on linux @ " + of_dir)
+				return 0
 			elif dir.dir_exists(steam_dir):
-				print("no of? dam")
-				dir.make_dir_recursive(of_dir) 
+				print("Steam detected on linux, however no open fortress.")
+				dir.make_dir_recursive(of_dir)
 				break
-			else:
-				print("no steam??? wtf")
-		if not steam_dir:
-			return
+		print("No steam install detected....?")
+		return 2
 	elif OS.get_name() == "Windows":
 		print("this is windows!")
 		var cmd_str = "@echo off\nfor /f \"tokens=2*\" %%a in ('reg query \"HKLM\\SOFTWARE\\WOW6432Node\\Valve\\Steam\" /v InstallPath') do @echo %%b"
@@ -42,12 +40,20 @@ func get_of_path():
 		var reg = []
 		OS.execute("cmd.exe",["/C",bat_path],true,reg)
 		if "ERROR" in reg[0]:
-			print("no steam??? wtf")
-			return
+			print("No steam install detected....?")
+			return 2
 		else:
 			steam_dir = reg[0].split("\n")[0].strip_edges()
 			of_dir = steam_dir + "\\steamapps\\sourcemods\\open_fortress"
-
+			var dir = Directory.new()
+			if dir.dir_exists(of_dir):
+				print("Open Fortress (folder) detected on windows @ " + of_dir)
+				return 0
+			elif dir.dir_exists(steam_dir):
+				print("Steam detected on windows, however no open fortress.")
+				dir.make_dir_recursive(of_dir)
+				return 1 
+		return 2 ## dunno what's happened to get here
 
 
 func check_tf2_sdk_exists():
