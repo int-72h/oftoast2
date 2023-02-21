@@ -56,18 +56,18 @@ func _ready():
 	yield(get_tree().create_timer(3),"timeout")
 	#$ViewportContainer/Viewport/Spatial.stop()
 	$TextureRect.stop()
-	yield(get_tree().create_timer(2),"timeout")
-	mainn = main.instance()
-	add_child(mainn)
-	yield(mainn,"draw")
-	$Control.modulate = Color.transparent
+	yield(get_tree().create_timer(2),"timeout") # to allow the transition
+	mainn = main.instance() # instance the main scene... this will call _init()
+	add_child(mainn) # add it! this will call _ready()
+	yield(mainn,"draw") # we wait for it to all chug through
+	$Control.modulate = Color.transparent # make the main scene transparent
 	var tween = get_tree().create_tween().set_parallel()
-	tween.tween_property($LoaderUI,"modulate",Color.transparent,1.5)
+	tween.tween_property($LoaderUI,"modulate",Color.transparent,1.5) # tween the two together
 	tween.tween_property($Control,"modulate",Color.white,1.5)
 	#$Control/Icon.visible = false
 	$TextureRect.call("switch")
 	yield(get_tree().create_timer(1.5),"timeout")
-	$Control.connect("started",$TextureRect,"_on_main_spin_start")
+	$Control.connect("started",$TextureRect,"_on_main_spin_start") # hook up the toast to the main stuff
 	$Control.connect("all_done",$TextureRect,"_on_main_spin_stop")
 	$TextureRect.in_main = true
 	#$Control/Icon.visible = true
