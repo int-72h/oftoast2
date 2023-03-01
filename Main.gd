@@ -27,7 +27,7 @@ var dl_array = []
 var threads = OS.get_processor_count()
 var delim = ""
 var changes
-var installed_revision
+var installed_revision = -1
 var max_threads = 72
 var latest_rev
 var path
@@ -61,7 +61,6 @@ func thing():
 		if path == null:
 			$VBoxContainer/Update.disabled = true
 			$VBoxContainer/Verify.disabled = true
-			installed_revision = -1
 		if of_status == 1:
 			steam.check_tf2_sdk_exists()
 	else:
@@ -84,13 +83,10 @@ func thing():
 		if error_result == RETRY:
 			return thing()
 		if error_result == HCF:
-			get_tree().quit()
+			OS.kill(OS.get_process_id())
 	var tmp = do_stuff()
 	if typeof(tmp) == TYPE_OBJECT:
 		yield(tmp,"completed")
-	if correct == false:
-		print("we shouldn't be here... quitting!")
-		get_tree().quit()
 	latest_rev = int(latest_rev)
 	target_revision = latest_rev
 	print(latest_rev)
@@ -123,7 +119,7 @@ func start(verify = false, dozip=true): # this does all the setup before the dow
 		verify = true
 	if installed_revision == -1 and verify == false and dozip == true:  # the zip thing
 		pass
-		$VBoxContainer3/Label2.text = "Using Advanced Compressed Archival Technology™..."
+		$VBoxContainer3/Label2.text = "Using Advanced Compressed Archive Technology™..."
 		var t = Thread.new()
 		arr_of_threads.append(t)
 		arr_of_threads[0].start(self,"_dozip",["https://toastware.org/toast/toastware/open_fortress.zip",path]) ## no url as it hasn't been implemented serverside yet
@@ -146,9 +142,6 @@ func start(verify = false, dozip=true): # this does all the setup before the dow
 			if error != OK and (error != 20):
 				print_debug("CRITICAL: can't write ")
 		if verify == false:
-			error = dir.remove(path + "/.revision")  # godot file/dir api consistently uses unix path seperators - GDNATIVE API DOESN'T?!
-			if error != OK:
-				print_debug("no .revision, ok....")
 			var file = File.new()
 			error = file.open(path + "/.dl_started", File.WRITE)  # allows us to check for partial dls
 			if error != OK:
@@ -162,6 +155,9 @@ func start(verify = false, dozip=true): # this does all the setup before the dow
 		else:
 			verify()
 	yield(self, "all_done")
+	error = dir.remove(path + "/.revision")  # godot file/dir api consistently uses unix path seperators - GDNATIVE API DOESN'T?!
+	if error != OK:
+		print_debug("no .revision, ok....")
 	var file = File.new()
 	error = file.open(path + "/.revision", File.WRITE)
 	if error != OK:
@@ -254,7 +250,7 @@ func filter(type, candidate_array):  # used for tvn shenanigans
 	return filtered_array
 
 func do_stuff(): # fetches the revisions, gets the list of changes and writes
-	revisions = tvn.fetch_revisions(url, -1, int(latest_rev), false)  # returns an error string otherwise
+	revisions = tvn.fetch_revisions(url, installed_revision, int(latest_rev), false)  # returns an error string otherwise
 	if typeof(revisions) != TYPE_ARRAY: # error handling
 		error_handler(("Error fetching revisions: "+ revisions),false,false)
 		yield(self, "error_handled")
@@ -266,7 +262,6 @@ func do_stuff(): # fetches the revisions, gets the list of changes and writes
 	for x in writes:
 		dl_array.append([url + "objects/" + x["object"], path + delim + x["path"], x["hash"]]) # format for the dlarray is [[url,path,hash]...]
 	print("stuff done")
-
 
 
 func verify():
