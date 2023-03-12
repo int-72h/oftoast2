@@ -1,3 +1,6 @@
+## This functions practically as a seperate program, besides its use of GDDL.
+## it was written by PySpy initially, and it's been extended to parse the OF website's RSS feed.
+
 extends Control
 const GDDL = preload("res://gdnative/gddl.gdns")
 enum {
@@ -230,8 +233,6 @@ func gen_tres(image_name):
 func _process(_delta):
 	pass
 	
-
-
 
 func _on_link_clicked(meta):
 	meta = str(meta)

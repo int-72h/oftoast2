@@ -9,7 +9,7 @@ var steam_dir
 var of_dir
 
 
-func get_of_path():
+func get_of_path(): # return codes: 0 = steam and OF, 1 = steam but no OF, 2 = no steam
 	if OS.get_name() == "X11":
 		print("Linux detected!")
 		var dir = Directory.new()
@@ -24,7 +24,7 @@ func get_of_path():
 			elif dir.dir_exists(steam_dir):
 				print("Steam detected on linux, however no open fortress.")
 				dir.make_dir_recursive(of_dir)
-				break
+				return 0
 		print("No steam install detected....?")
 		return 2
 	elif OS.get_name() == "Windows":
@@ -70,7 +70,6 @@ func check_tf2_sdk_exists():
 			
 
 func check_disk_space(path):
-	return true
 	if OS.get_name() == "X11":
 		print("getting disk space...")
 		var cmdstring = "df -PT | awk '{ if (NR!=1) {print $5, $7}}'"
@@ -119,7 +118,7 @@ func check_disk_space(path):
 				a.append(f)
 		a.pop_front() #remove caption
 		for x in a:
-			if path.begins_with(x[0]):
-				if int(x[1]) <= 8589934592: #bytes
+			if path.begins_with(x[0]) and len(x) > 7:
+				if int(x[7]) <= 8589934592: #bytes
 					return false
 				return true

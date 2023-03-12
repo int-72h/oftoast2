@@ -299,7 +299,6 @@ texture_normal = ExtResource( 15 )
 expand = true
 
 [node name="Popup1" parent="." instance=ExtResource( 4 )]
-visible = false
 anchor_top = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0
@@ -331,7 +330,6 @@ access = 2
 
 [connection signal="error_handled" from="." to="." method="_on_error_handled"]
 [connection signal="file_done" from="." to="." method="_on_Control_file_done"]
-[connection signal="verif_fail" from="." to="." method="_on_Control_verif_fail"]
 [connection signal="pressed" from="VBoxContainer/Update" to="." method="_on_Update_pressed"]
 [connection signal="pressed" from="VBoxContainer/Update2" to="." method="_throw_error"]
 [connection signal="pressed" from="VBoxContainer/Verify" to="." method="_on_Verify_pressed"]

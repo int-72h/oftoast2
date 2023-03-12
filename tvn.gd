@@ -22,20 +22,15 @@ func replay_changes(changesets):
 	for revision in changesets:
 		for change in revision:
 			cumlmap[change["path"]] = change
-	return map_to_changes(cumlmap)
-
+	var z = cumlmap.values()
+	return z
+	
 func changes_to_map(changes):
 	var d = {}
 	if changes == null:
 		return d
 	for x in changes:
 		d[x["path"]] = x
-	return d
-
-func map_to_changes(changes):
-	var d = []
-	for key in changes:
-		d.append(changes[key])
 	return d
 
 func invert_change(change):

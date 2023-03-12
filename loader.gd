@@ -5,7 +5,7 @@ var default_url = "https://toastware.org/toast/"
 const version = 0
 const CONTINUE = 0
 const RETRY = 1
-const HCF = 2  # use an enum damnit!!!!!!
+const HCF = 2  # use an enum!!
 const INPUT = 3
 var gd = GDDL.new()
 var mainn
@@ -30,7 +30,7 @@ func _ready():
 			OS.kill(OS.get_process_id())
 		OS.execute(OS.get_executable_path(),[],false)
 		OS.kill(OS.get_process_id())
-	var newver = gd.download_to_string(default_url+"toastware/latest_t2.ver")  ## commented out for now as it hasn't been implemented serverside yet, but it does work
+	var newver = gd.download_to_string(default_url+"toastware/latest_t2.ver")
 	if not newver.is_valid_integer():
 		error_handler("Can't check for latest launcher version! could be an internet connection issue.",false,false)
 		yield(self,"error_handled")
@@ -40,7 +40,6 @@ func _ready():
 			RETRY:
 				OS.kill(OS.get_process_id())
 	if int(newver) > version:
-		var pid = OS.get_process_id()
 		if OS.get_name() == "X11":
 			var exec_path = ProjectSettings.globalize_path("user://" + newver)
 			gd.download_file("/toastware/latest_t2.nix",exec_path) # download latest launcher...

@@ -3,10 +3,10 @@ extends Control
 
 signal all_done
 signal file_done(path)
-signal verif_fail(path)
+#signal verif_fail(path)
 signal error_handled
 signal started
-signal settings_ok
+#signal settings_ok
 const CONTINUE = 0
 const RETRY = 1
 const HCF = 2  # use an enum damnit!!!!!!
@@ -48,7 +48,12 @@ func _ready():
 	call_deferred("thing")
 	$advlabel.rect_position = Vector2(-800, 0)
 	$AdvancedPanel.rect_position = Vector2(-800, 150)
-	
+
+## what we're doing here is:
+## 1) set the url and init gddl
+## 2) get the path. if there's no path set the ui up, if there is do all that stuff, and calculate the revisions and writes
+## 3) fetch the latest revision + error handling
+## 4) set UI with appropriate revision info
 func thing():
 	url = "https://toastware.org/toast/" # use mirrors idk
 	var gd = GDDL.new()
@@ -63,7 +68,9 @@ func thing():
 			$VBoxContainer/Verify.disabled = true
 		if of_status == 1:
 			steam.check_tf2_sdk_exists()
+		$VBoxContainer2/Label.text = "OF PATH NOT FOUND!"
 	else:
+		steam.check_tf2_sdk_exists()
 		path = steam.of_dir
 		print(path)
 		installed_revision = tvn.get_installed_revision(path)  # see if anythings already where we're downloading
@@ -71,11 +78,9 @@ func thing():
 		$AdvancedPanel.inst_dir.text = path
 		$FileDialog.current_path = path
 	latest_rev = gd.download_to_string(url + "/revisions/latest")
-	var correct = false
 	print(gd.get_error())
 	if gd.get_error() == OK:
 		print("OK!")
-		correct = true
 	if gd.get_error() != OK:
 		print("not ok...")
 		error_handler("Downloading target threads and/or latest revision failed:\n" + str(gd.get_detailed_error()))
@@ -84,16 +89,18 @@ func thing():
 			return thing()
 		if error_result == HCF:
 			OS.kill(OS.get_process_id())
-	var tmp = do_stuff()
-	if typeof(tmp) == TYPE_OBJECT:
-		yield(tmp,"completed")
 	latest_rev = int(latest_rev)
 	target_revision = latest_rev
 	print(latest_rev)
+	if path != null:
+		var tmp = fetch_calculate_revisions()
+		if typeof(tmp) == TYPE_OBJECT:
+			yield(tmp,"completed")
 	$AdvancedPanel.threads.text = str(threads)
-	if installed_revision == -1:
+	if installed_revision == -1 and path != null:
 		$VBoxContainer2/Label.text = "NOT INSTALLED!"
-	else:
+		$VBoxContainer/Verify.text = "Check Existing"
+	elif path != null:
 		$VBoxContainer2/Label.text = "INSTALLED: " + str(installed_revision)
 	$VBoxContainer2/Label2.text = "LATEST: " + str(latest_rev)
 	if installed_revision == latest_rev:
@@ -127,7 +134,7 @@ func start(verify = false, dozip=true): # this does all the setup before the dow
 		if verify:
 			$VBoxContainer3/Label2.text = "Verifying..."
 			installed_revision = -1
-			do_stuff()
+			fetch_calculate_revisions()
 		$VBoxContainer3/ProgressBar.max_value = len(dl_array)
 		$VBoxContainer3/ProgressBar.value = 0
 		for x in filter(tvn.TYPE_DELETE, changes):
@@ -247,9 +254,11 @@ func filter(type, candidate_array):  # used for tvn shenanigans
 	for candidate_value in candidate_array:
 		if candidate_value["type"] == type:
 			filtered_array.append(candidate_value)
-	return filtered_array
 
-func do_stuff(): # fetches the revisions, gets the list of changes and writes
+
+## now you're probably wondering why this has the above filter() function inside of it - 
+## the gdscript debugger crashes otherwise. don't ask.
+func fetch_calculate_revisions(): # fetches the revisions, gets the list of changes and write
 	revisions = tvn.fetch_revisions(url, installed_revision, int(latest_rev), false)  # returns an error string otherwise
 	if typeof(revisions) != TYPE_ARRAY: # error handling
 		error_handler(("Error fetching revisions: "+ revisions),false,false)
@@ -257,8 +266,17 @@ func do_stuff(): # fetches the revisions, gets the list of changes and writes
 		if error_result == RETRY or error_result == CONTINUE:
 			return thing()
 		return
-	changes = tvn.replay_changes(revisions)
-	writes = filter(tvn.TYPE_WRITE, changes) # we only want the writes
+	var cumlmap = {}
+	if revisions == null:
+		return []
+	for revision in revisions:
+		for change in revision:
+			cumlmap[change["path"]] = change
+	changes = cumlmap.values()
+	writes = []
+	for candidate_value in changes:
+		if candidate_value["type"] == tvn.TYPE_WRITE:
+			writes.append(candidate_value)
 	for x in writes:
 		dl_array.append([url + "objects/" + x["object"], path + delim + x["path"], x["hash"]]) # format for the dlarray is [[url,path,hash]...]
 	print("stuff done")
@@ -295,7 +313,7 @@ func _verify():
 
 
 func error_handler(error, input = false,cont=true):
-	var dunn = preload("res://assets/this-is-bad.wav")
+	var dunn = preload("res://assets/this-is-bad.wav") ## OOOOOH THIS IS BAD.
 	$SFX.stream = dunn
 	$SFX.play()
 	$Popup1.init(error,input,cont)

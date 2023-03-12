@@ -48,5 +48,3 @@ func switch():
 	tween.tween_property(self,"rect_rotation",0.0,time).set_trans(trans).set_ease(easing)
 	tween.tween_property(self,"rect_position",Vector2(55,125),time).set_trans(trans).set_ease(easing)
 	yield(get_tree().create_timer(time),"timeout")
-
-
