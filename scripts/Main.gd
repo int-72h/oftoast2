@@ -125,11 +125,10 @@ func start(verify = false, dozip=true): # this does all the setup before the dow
 	if tvn.check_partial_download(path) > 0:
 		verify = true
 	if installed_revision == -1 and verify == false and dozip == true:  # the zip thing
-		pass
 		$VBoxContainer3/Label2.text = "Downloading... [ZIP]"
 		var t = Thread.new()
 		arr_of_threads.append(t)
-		arr_of_threads[0].start(self,"_dozip",["https://toastware.org/toast/toastware/open_fortress.zip",path]) ## no url as it hasn't been implemented serverside yet
+		arr_of_threads[-1].start(self,"_dozip",["https://toastware.org/toast/toastware/open_fortress.zip",path])
 	else:
 		if verify:
 			$VBoxContainer3/Label2.text = "Verifying..."
@@ -185,6 +184,7 @@ func start(verify = false, dozip=true): # this does all the setup before the dow
 
 
 func _dozip(arr):
+	print("thread started!")
 	var url = arr[0]
 	var lpath = arr[1]
 	var dl_object = GDDL.new()
@@ -194,6 +194,7 @@ func _dozip(arr):
 	$VBoxContainer3/ProgressBar.max_value = 3000000000
 	$Timer.start()
 	var ziploc = ProjectSettings.globalize_path("user://latest.zip")
+	print("downloading zip...")
 	dl_object.download_file(url, ziploc)
 	if dl_object.get_error() != 0:
 		error_handler("failed to download zip: " + dl_object.get_detailed_error() +"\n(error code"+dl_object.get_error()+")",false,false) # more error handling
@@ -210,8 +211,8 @@ func _dozip(arr):
 	var f = Directory.new()
 	print("now we delete the zip...")
 	f.remove(ziploc)  ## delete zip
-	done_threads_arr.append(0)
 	$Timer.stop()
+	done_threads_arr.append(0)
 
 func work(): # this starts all the threads
 	for x in range(0, threads):
@@ -262,6 +263,7 @@ func filter(type, candidate_array):  # used for tvn shenanigans
 	for candidate_value in candidate_array:
 		if candidate_value["type"] == type:
 			filtered_array.append(candidate_value)
+	return filtered_array
 
 
 ## now you're probably wondering why this has the above filter() function inside of it - 
@@ -287,7 +289,7 @@ func fetch_calculate_revisions(): # fetches the revisions, gets the list of chan
 			writes.append(candidate_value)
 	for x in writes:
 		dl_array.append([url + "objects/" + x["object"], path + delim + x["path"], x["hash"]]) # format for the dlarray is [[url,path,hash]...]
-	print("stuff done")
+	print("Revisions + downloads calculated")
 
 
 func verify():
@@ -298,12 +300,14 @@ func verify():
 
 func _verify():
 	if dl_array == []:
-		print("huh?")
+		print("This shouldn't happen - downloads haven't been calculated yet...")
+		done_threads_arr.append(0)
+		return
 	var redl_array = []
 	var file = File.new()
 	for dl in dl_array:
 		if dl[2] != file.get_md5(dl[1]):
-			print("MISMATCH:" + file.get_md5(dl[1]) + " " + dl[2])
+			#print("MISMATCH:" + file.get_md5(dl[1]) + " " + dl[2])
 			#emit_signal("verif_fail", dl[1])
 			redl_array.append(dl)
 		else:
@@ -312,7 +316,8 @@ func _verify():
 	if redl_array == []:
 		emit_signal("all_done")
 	elif len(redl_array) == len(dl_array):
-		start(false,true)
+		print("ok there's nothing here. just download the zip...")
+		start()
 	else:
 		dl_array = redl_array
 		$VBoxContainer3/Label2.text = "Redownloading " + str(len(dl_array)) + " files"
@@ -446,12 +451,12 @@ func _throw_error():  # throws an error
 
 
 func _process(_delta): # this is the thread culler - it checks if any threads are done then waits for them to finish
-	if len(done_threads_arr) > 0:
+	if len(done_threads_arr) > 0: # thread no. is in this array
 		for t in done_threads_arr:
-			arr_of_threads[t].wait_to_finish()
-			done_threads += 1
-		done_threads_arr = []
-	if done_threads == int(threads):
+			arr_of_threads[t].wait_to_finish() # wait on it...
+			done_threads += 1 
+		done_threads_arr = [] # empty array
+	if done_threads == len(arr_of_threads) and done_threads > 0:
 		emit_signal("all_done")
 		done_threads = 0
 		done_threads_arr = []
@@ -465,6 +470,6 @@ func _on_Timer_timeout():
 	var z = File.new()
 	z.open(ProjectSettings.globalize_path("user://latest.zip"),File.READ)
 	var length = z.get_len()
-	print(length)
+	print(str(length) + "/~3000000000")
 	z.close()
 	$VBoxContainer3/ProgressBar.value = length
