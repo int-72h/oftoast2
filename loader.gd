@@ -2,7 +2,7 @@ extends Control
 const GDDL = preload("res://gdnative/gddl.gdns")
 const main = preload("res://Main.tscn")
 var default_url = "https://toastware.org/toast/"
-const version = 0
+const version = 1
 const CONTINUE = 0
 const RETRY = 1
 const HCF = 2  # use an enum!!
@@ -42,9 +42,16 @@ func _ready():
 	if int(newver) > version:
 		if OS.get_name() == "X11":
 			var exec_path = ProjectSettings.globalize_path("user://" + newver)
-			gd.download_file("/toastware/latest_t2.nix",exec_path) # download latest launcher...
-			if gd.get_error() == 0:	
-				OS.execute("/bin/bash",["-c",exec_path])
+			gd.download_file(default_url + "toastware/latest_t2.nix",exec_path) # download latest launcher...
+			if gd.get_error() == 0:
+				OS.execute("chmod",["+x",exec_path])
+				OS.execute(exec_path,[],false)
+				OS.kill(OS.get_process_id())
+		else:
+			var exec_path = ProjectSettings.globalize_path("user://" + newver)
+			gd.download_file(default_url+ "toastware/latest_t2.exe",exec_path) # download latest launcher...
+			if gd.get_error() == 0:
+				OS.execute(exec_path,[],false)
 				OS.kill(OS.get_process_id())
 	print("Downloading failed...")
 	var dl_object = GDDL.new()
