@@ -327,6 +327,9 @@ window_title = "Open a Directory"
 mode = 2
 access = 2
 
+[node name="Timer" type="Timer" parent="."]
+wait_time = 2.0
+
 [connection signal="error_handled" from="." to="." method="_on_error_handled"]
 [connection signal="file_done" from="." to="." method="_on_Control_file_done"]
 [connection signal="pressed" from="VBoxContainer/Update" to="." method="_on_Update_pressed"]
@@ -338,3 +341,4 @@ access = 2
 [connection signal="pressed" from="HBoxContainer/TextureButton3" to="HBoxContainer" method="_on_TextureButton3_pressed"]
 [connection signal="picker_open" from="AdvancedPanel" to="." method="_on_AdvancedPanel_picker_open"]
 [connection signal="dir_selected" from="FileDialog" to="AdvancedPanel" method="_on_FileDialog_dir_selected"]
+[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]

@@ -5,7 +5,6 @@ var spin = true
 var in_main = false
 
 func _on_main_spin_start():
-	print("starting spinning")
 	if spin == true:
 		tween = get_tree().create_tween()
 		tween.connect("finished",self,"_on_main_spin_start")
@@ -42,7 +41,7 @@ func switch():
 	var time = 1.5
 	var trans = Tween.TRANS_QUART
 	var easing = Tween.EASE_IN_OUT
-	tween.tween_property(self,"rect_pivot_offset",Vector2(172,172),time).set_trans(trans).set_ease(easing)
+	tween.tween_property(self,"rect_pivot_offset",Vector2(170,170),time).set_trans(trans).set_ease(easing)
 	tween.tween_property(self,"rect_size",Vector2(340,340),time).set_trans(trans).set_ease(easing)
 	tween.tween_property(self,"modulate",Color.white,time).set_trans(trans).set_ease(easing)
 	tween.tween_property(self,"rect_rotation",0.0,time).set_trans(trans).set_ease(easing)

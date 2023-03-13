@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://fonts/Oswald-Medium.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://scripts/loader.gd" type="Script" id=2]
@@ -17,6 +17,13 @@ font_path = "res://fonts/Staatliches-Regular.ttf"
 size = 70
 font_data = SubResource( 5 )
 
+[sub_resource type="DynamicFontData" id=1]
+font_path = "res://fonts/SpaceMono-Regular.ttf"
+
+[sub_resource type="DynamicFont" id=8]
+size = 24
+font_data = SubResource( 1 )
+
 [sub_resource type="DynamicFont" id=4]
 size = 35
 extra_spacing_bottom = 4
@@ -27,12 +34,12 @@ size = 20
 extra_spacing_bottom = 4
 font_data = ExtResource( 1 )
 
-[sub_resource type="DynamicFontData" id=1]
+[sub_resource type="DynamicFontData" id=9]
 font_path = "res://fonts/Staatliches-Regular.ttf"
 
 [sub_resource type="DynamicFont" id=6]
 size = 400
-font_data = SubResource( 1 )
+font_data = SubResource( 9 )
 
 [node name="Control" type="Control"]
 anchor_right = 1.0
@@ -62,11 +69,11 @@ margin_right = 40.0
 margin_bottom = 40.0
 
 [node name="TextureRect2" type="TextureRect" parent="LoaderUI"]
-margin_left = 8.0
-margin_top = 936.0
-margin_right = 148.0
-margin_bottom = 1076.0
-rect_pivot_offset = Vector2( 70, 70 )
+margin_left = 13.0
+margin_top = 912.0
+margin_right = 173.0
+margin_bottom = 1072.0
+rect_pivot_offset = Vector2( 80, 80 )
 texture = ExtResource( 3 )
 expand = true
 script = ExtResource( 10 )
@@ -81,22 +88,38 @@ custom_fonts/font = ExtResource( 6 )
 text = "OFtoast"
 
 [node name="Label3" type="Label" parent="LoaderUI"]
-margin_left = 552.0
+margin_left = 856.0
 margin_top = 264.0
-margin_right = 1412.0
-margin_bottom = 898.0
+margin_right = 1410.0
+margin_bottom = 443.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 custom_fonts/font = SubResource( 2 )
 text = "a toastware project
-powered by tvn
+powered by tvn"
+align = 2
 
+[node name="Label6" type="Label" parent="LoaderUI"]
+margin_left = 864.0
+margin_top = 808.0
+margin_right = 1414.0
+margin_bottom = 896.0
+custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "codename \"pinnacle\""
+align = 2
 
-
-
-codename \"pinnacle\""
+[node name="Label7" type="Label" parent="LoaderUI"]
+margin_left = 858.0
+margin_top = 1032.0
+margin_right = 1408.0
+margin_bottom = 1068.0
+custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
+custom_fonts/font = SubResource( 8 )
+text = "built from git - currently alpha5+"
 align = 2
 
 [node name="Label4" type="Label" parent="LoaderUI"]
+visible = false
 margin_left = 13.0
 margin_top = 577.0
 margin_right = 429.0
@@ -111,10 +134,10 @@ pont (UI Design)
 Bryson"
 
 [node name="Label5" type="Label" parent="LoaderUI"]
-margin_left = 152.0
-margin_top = 928.0
-margin_right = 757.0
-margin_bottom = 1073.0
+margin_left = 184.0
+margin_top = 920.0
+margin_right = 732.0
+margin_bottom = 1065.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 custom_fonts/font = SubResource( 7 )
 text = "A Toastware project for Superdiffusion.
@@ -123,10 +146,10 @@ This product is FREE SOFTWARE, you can distribute/modify it according
 to the terms of the MIT License. See about page for more info."
 
 [node name="Label2" type="Label" parent="LoaderUI"]
-margin_left = 966.0
-margin_top = 371.0
-margin_right = 1422.0
-margin_bottom = 871.0
+margin_left = 968.0
+margin_top = 384.0
+margin_right = 1424.0
+margin_bottom = 884.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 custom_fonts/font = SubResource( 6 )
 text = "2.0"

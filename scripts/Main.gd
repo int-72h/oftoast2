@@ -16,12 +16,12 @@ const TVN = preload("res://scripts/tvn.gd")
 var music = preload("res://assets/toast.wav")
 var start_music = preload("res://assets/start.wav")
 var done = preload("res://assets/done.wav")
-var user_threads
+var user_threads = 8
 var revisions = []
 var arr_of_threads = []
 var downloading
-var done_threads = 0
 var done_threads_arr = []
+var done_threads = 0
 var failed_files = []
 var dl_array = []
 var threads = OS.get_processor_count()
@@ -109,6 +109,7 @@ func thing():
 
 
 func start(verify = false, dozip=true): # this does all the setup before the downloading such as creating folders, UI, etc
+	threads = user_threads
 	$VBoxContainer3/Label2.text = "Downloading..."
 	$VBoxContainer3/Label2.show()
 	$VBoxContainer3/ProgressBar.show()
@@ -121,12 +122,11 @@ func start(verify = false, dozip=true): # this does all the setup before the dow
 	emit_signal("started")
 	var dir = Directory.new()
 	var error
-
 	if tvn.check_partial_download(path) > 0:
 		verify = true
 	if installed_revision == -1 and verify == false and dozip == true:  # the zip thing
 		pass
-		$VBoxContainer3/Label2.text = "Using Advanced Compressed Archive Technology™..."
+		$VBoxContainer3/Label2.text = "Downloading... [ZIP]"
 		var t = Thread.new()
 		arr_of_threads.append(t)
 		arr_of_threads[0].start(self,"_dozip",["https://toastware.org/toast/toastware/open_fortress.zip",path]) ## no url as it hasn't been implemented serverside yet
@@ -188,22 +188,30 @@ func _dozip(arr):
 	var url = arr[0]
 	var lpath = arr[1]
 	var dl_object = GDDL.new()
+	user_threads = threads
+	threads = 1
+	$VBoxContainer3/ProgressBar.allow_greater = true
+	$VBoxContainer3/ProgressBar.max_value = 3000000000
+	$Timer.start()
 	var ziploc = ProjectSettings.globalize_path("user://latest.zip")
-	var error = tvn.download_file(url, ziploc)
-	if error != tvn.OK:
-		error_handler("failed to download zip: " + error,false,false) # more error handling
+	dl_object.download_file(url, ziploc)
+	if dl_object.get_error() != 0:
+		error_handler("failed to download zip: " + dl_object.get_detailed_error() +"\n(error code"+dl_object.get_error()+")",false,false) # more error handling
 		yield(self, "error_handled")
 		match error_result:
 			RETRY:
 				return _dozip(arr)
-			
+	print("unzipping time...")
+	$VBoxContainer3/Label2.text = "Extracting..."
 	var z = dl_object.unzip(ziploc, lpath)
 	if z != "0":
 		error_handler("failed to unzip!")
 		yield(self, "error_handled")
 	var f = Directory.new()
+	print("now we delete the zip...")
 	f.remove(ziploc)  ## delete zip
 	done_threads_arr.append(0)
+	$Timer.stop()
 
 func work(): # this starts all the threads
 	for x in range(0, threads):
@@ -451,3 +459,12 @@ func _process(_delta): # this is the thread culler - it checks if any threads ar
 
 func _on_AdvancedPanel_picker_open():
 	$FileDialog.popup()
+
+
+func _on_Timer_timeout():
+	var z = File.new()
+	z.open(ProjectSettings.globalize_path("user://latest.zip"),File.READ)
+	var length = z.get_len()
+	print(length)
+	z.close()
+	$VBoxContainer3/ProgressBar.value = length
