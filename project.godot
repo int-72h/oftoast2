@@ -12,7 +12,7 @@ _global_script_classes=[ {
 "base": "Node",
 "class": "tvn",
 "language": "GDScript",
-"path": "res://tvn.gd"
+"path": "res://scripts/tvn.gd"
 } ]
 _global_script_class_icons={
 "tvn": ""
@@ -22,7 +22,7 @@ _global_script_class_icons={
 
 config/name="oftoast2"
 config/description="THAT'S RIGHT OFTOAST II 2 BABY"
-run/main_scene="res://loader.tscn"
+run/main_scene="res://scenes/loader.tscn"
 config/custom_user_dir_name="toastware"
 run/low_processor_mode=true
 boot_splash/image="res://unknown.png"

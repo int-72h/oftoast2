@@ -1,17 +1,18 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=17 format=2]
 
-[ext_resource path="res://loader.gd" type="Script" id=1]
-[ext_resource path="res://assets/toast.png" type="Texture" id=2]
-[ext_resource path="res://assets/mainfont.tres" type="DynamicFont" id=3]
-[ext_resource path="res://Oswald-Medium.ttf" type="DynamicFontData" id=4]
-[ext_resource path="res://toast.gd" type="Script" id=5]
-[ext_resource path="res://Popup.tscn" type="PackedScene" id=6]
-[ext_resource path="res://assets/slateware-of.png" type="Texture" id=7]
-[ext_resource path="res://assets/dm_thames_widescreen_toast.png" type="Texture" id=8]
+[ext_resource path="res://fonts/Oswald-Medium.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://scripts/loader.gd" type="Script" id=2]
+[ext_resource path="res://assets/slateware-of.png" type="Texture" id=3]
+[ext_resource path="res://scripts/toast.gd" type="Script" id=4]
+[ext_resource path="res://assets/toast.png" type="Texture" id=5]
+[ext_resource path="res://assets/mainfont.tres" type="DynamicFont" id=6]
+[ext_resource path="res://assets/dm_thames_widescreen_toast.png" type="Texture" id=7]
+[ext_resource path="res://scenes/Popup.tscn" type="PackedScene" id=8]
 [ext_resource path="res://toast3.tscn" type="PackedScene" id=9]
+[ext_resource path="res://scenes/adastral.gd" type="Script" id=10]
 
 [sub_resource type="DynamicFontData" id=5]
-font_path = "res://assets/Staatliches-Regular.ttf"
+font_path = "res://fonts/Staatliches-Regular.ttf"
 
 [sub_resource type="DynamicFont" id=2]
 size = 70
@@ -20,15 +21,15 @@ font_data = SubResource( 5 )
 [sub_resource type="DynamicFont" id=4]
 size = 35
 extra_spacing_bottom = 4
-font_data = ExtResource( 4 )
+font_data = ExtResource( 1 )
 
 [sub_resource type="DynamicFont" id=7]
 size = 20
 extra_spacing_bottom = 4
-font_data = ExtResource( 4 )
+font_data = ExtResource( 1 )
 
 [sub_resource type="DynamicFontData" id=1]
-font_path = "res://assets/Staatliches-Regular.ttf"
+font_path = "res://fonts/Staatliches-Regular.ttf"
 
 [sub_resource type="DynamicFont" id=6]
 size = 400
@@ -37,13 +38,13 @@ font_data = SubResource( 1 )
 [node name="Control" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource( 1 )
+script = ExtResource( 2 )
 
 [node name="TextureRect2" type="TextureRect" parent="."]
 margin_left = -728.0
 margin_right = 1440.0
 margin_bottom = 1104.0
-texture = ExtResource( 8 )
+texture = ExtResource( 7 )
 stretch_mode = 5
 
 [node name="TextureRect" type="TextureRect" parent="."]
@@ -52,10 +53,10 @@ margin_top = -176.0
 margin_right = 417.0
 margin_bottom = 574.0
 rect_pivot_offset = Vector2( 375, 375 )
-texture = ExtResource( 2 )
+texture = ExtResource( 5 )
 expand = true
 stretch_mode = 1
-script = ExtResource( 5 )
+script = ExtResource( 4 )
 
 [node name="LoaderUI" type="Control" parent="."]
 margin_right = 40.0
@@ -64,10 +65,12 @@ margin_bottom = 40.0
 [node name="TextureRect2" type="TextureRect" parent="LoaderUI"]
 margin_left = 8.0
 margin_top = 936.0
-margin_right = 144.0
-margin_bottom = 1075.0
-texture = ExtResource( 7 )
+margin_right = 148.0
+margin_bottom = 1076.0
+rect_pivot_offset = Vector2( 70, 70 )
+texture = ExtResource( 3 )
 expand = true
+script = ExtResource( 10 )
 
 [node name="Label" type="Label" parent="LoaderUI"]
 margin_left = 664.0
@@ -75,7 +78,7 @@ margin_top = -8.0
 margin_right = 1413.0
 margin_bottom = 305.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/font = ExtResource( 6 )
 text = "OFtoast"
 
 [node name="Label3" type="Label" parent="LoaderUI"]
@@ -110,9 +113,9 @@ Bryson"
 
 [node name="Label5" type="Label" parent="LoaderUI"]
 margin_left = 152.0
-margin_top = 936.0
+margin_top = 928.0
 margin_right = 757.0
-margin_bottom = 1081.0
+margin_bottom = 1073.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 custom_fonts/font = SubResource( 7 )
 text = "A Toastware project for Superdiffusion.
@@ -131,7 +134,7 @@ text = "2.0"
 
 [node name="SFX" type="AudioStreamPlayer" parent="."]
 
-[node name="Popup1" parent="." instance=ExtResource( 6 )]
+[node name="Popup1" parent="." instance=ExtResource( 8 )]
 margin_left = 40.0
 margin_top = -464.0
 margin_right = -715.0

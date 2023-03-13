@@ -1,27 +1,27 @@
 [gd_scene load_steps=25 format=2]
 
-[ext_resource path="res://assets/previous.png" type="Texture" id=1]
-[ext_resource path="res://Oswald-Medium.ttf" type="DynamicFontData" id=2]
-[ext_resource path="res://Main.gd" type="Script" id=3]
-[ext_resource path="res://Popup.tscn" type="PackedScene" id=4]
-[ext_resource path="res://assets/up.png" type="Texture" id=5]
+[ext_resource path="res://scripts/MusicControls.gd" type="Script" id=1]
+[ext_resource path="res://fonts/Oswald-Medium.ttf" type="DynamicFontData" id=2]
+[ext_resource path="res://scripts/Main.gd" type="Script" id=3]
+[ext_resource path="res://assets/up.png" type="Texture" id=4]
+[ext_resource path="res://fonts/Oswald-Bold.ttf" type="DynamicFontData" id=5]
 [ext_resource path="res://ui_theme.tres" type="Theme" id=6]
-[ext_resource path="res://assets/toast.wav" type="AudioStream" id=7]
-[ext_resource path="res://steam.gd" type="Script" id=8]
-[ext_resource path="res://PageBrain.tscn" type="PackedScene" id=9]
-[ext_resource path="res://templabel.gd" type="Script" id=10]
-[ext_resource path="res://Oswald-Bold.ttf" type="DynamicFontData" id=11]
+[ext_resource path="res://assets/previous.png" type="Texture" id=7]
+[ext_resource path="res://scripts/templabel.gd" type="Script" id=8]
+[ext_resource path="res://assets/toast.wav" type="AudioStream" id=9]
+[ext_resource path="res://scripts/steam.gd" type="Script" id=10]
+[ext_resource path="res://assets/next.png" type="Texture" id=11]
 [ext_resource path="res://unknown.png" type="Texture" id=12]
-[ext_resource path="res://advanced.tscn" type="PackedScene" id=13]
-[ext_resource path="res://assets/next.png" type="Texture" id=15]
-[ext_resource path="res://MusicControls.gd" type="Script" id=16]
+[ext_resource path="res://scenes/PageBrain.tscn" type="PackedScene" id=13]
+[ext_resource path="res://scenes/advanced.tscn" type="PackedScene" id=14]
+[ext_resource path="res://scenes/Popup.tscn" type="PackedScene" id=15]
 
 [sub_resource type="DynamicFont" id=5]
 size = 60
 font_data = ExtResource( 2 )
 
 [sub_resource type="DynamicFontData" id=1]
-font_path = "res://assets/Staatliches-Regular.ttf"
+font_path = "res://fonts/Staatliches-Regular.ttf"
 
 [sub_resource type="DynamicFont" id=2]
 size = 39
@@ -30,7 +30,7 @@ font_data = SubResource( 1 )
 [sub_resource type="StyleBoxEmpty" id=4]
 
 [sub_resource type="DynamicFontData" id=6]
-font_path = "res://Oswald-Bold.ttf"
+font_path = "res://fonts/Oswald-Bold.ttf"
 
 [sub_resource type="DynamicFont" id=7]
 size = 60
@@ -44,7 +44,7 @@ font_data = SubResource( 6 )
 
 [sub_resource type="DynamicFont" id=3]
 size = 60
-font_data = ExtResource( 11 )
+font_data = ExtResource( 5 )
 
 [sub_resource type="DynamicFont" id=9]
 size = 45
@@ -61,7 +61,7 @@ script = ExtResource( 3 )
 [node name="steam" type="Control" parent="."]
 margin_right = 40.0
 margin_bottom = 40.0
-script = ExtResource( 8 )
+script = ExtResource( 10 )
 
 [node name="templabel" type="Label" parent="."]
 margin_left = 528.0
@@ -71,7 +71,7 @@ margin_bottom = 114.0
 custom_fonts/font = SubResource( 5 )
 text = "LATEST FROM THE BLOG:"
 align = 1
-script = ExtResource( 10 )
+script = ExtResource( 8 )
 
 [node name="advlabel" type="Label" parent="."]
 margin_left = 528.0
@@ -82,10 +82,9 @@ theme = ExtResource( 6 )
 custom_fonts/font = SubResource( 5 )
 text = "ADVANCED OPTIONS"
 align = 1
-script = ExtResource( 10 )
 
 [node name="Music" type="AudioStreamPlayer" parent="."]
-stream = ExtResource( 7 )
+stream = ExtResource( 9 )
 volume_db = -80.0
 
 [node name="SFX" type="AudioStreamPlayer" parent="."]
@@ -192,14 +191,14 @@ __meta__ = {
 
 [node name="Label" type="Label" parent="VBoxContainer2"]
 margin_right = 332.0
-margin_bottom = 94.0
+margin_bottom = 6.0
 custom_fonts/font = SubResource( 7 )
 text = "INSTALLED:"
 
 [node name="Label2" type="Label" parent="VBoxContainer2"]
-margin_top = 98.0
+margin_top = 10.0
 margin_right = 332.0
-margin_bottom = 192.0
+margin_bottom = 16.0
 custom_fonts/font = SubResource( 8 )
 text = "LATEST:"
 
@@ -218,7 +217,7 @@ margin_top = 128.0
 margin_right = 1412.0
 margin_bottom = 1064.0
 
-[node name="BlogPanel" parent="VBoxContainer3" instance=ExtResource( 9 )]
+[node name="BlogPanel" parent="VBoxContainer3" instance=ExtResource( 13 )]
 margin_right = 884.0
 margin_bottom = 936.0
 size_flags_vertical = 3
@@ -267,7 +266,7 @@ margin_left = 72.0
 margin_top = 464.0
 margin_right = 400.0
 margin_bottom = 560.0
-script = ExtResource( 16 )
+script = ExtResource( 1 )
 __meta__ = {
 "_edit_group_": true
 }
@@ -277,7 +276,7 @@ margin_right = 106.0
 margin_bottom = 96.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-texture_normal = ExtResource( 1 )
+texture_normal = ExtResource( 7 )
 expand = true
 
 [node name="TextureButton2" type="TextureButton" parent="HBoxContainer"]
@@ -286,7 +285,7 @@ margin_right = 217.0
 margin_bottom = 96.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-texture_normal = ExtResource( 5 )
+texture_normal = ExtResource( 4 )
 expand = true
 
 [node name="TextureButton3" type="TextureButton" parent="HBoxContainer"]
@@ -295,10 +294,10 @@ margin_right = 328.0
 margin_bottom = 96.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-texture_normal = ExtResource( 15 )
+texture_normal = ExtResource( 11 )
 expand = true
 
-[node name="Popup1" parent="." instance=ExtResource( 4 )]
+[node name="Popup1" parent="." instance=ExtResource( 15 )]
 anchor_top = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0
@@ -308,7 +307,7 @@ margin_right = 704.0
 margin_bottom = 333.0
 rect_min_size = Vector2( 400, 140 )
 
-[node name="AdvancedPanel" parent="." instance=ExtResource( 13 )]
+[node name="AdvancedPanel" parent="." instance=ExtResource( 14 )]
 visible = false
 anchor_left = 0.0
 anchor_top = 0.0

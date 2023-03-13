@@ -1,8 +1,8 @@
 [gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://ui_theme.tres" type="Theme" id=1]
-[ext_resource path="res://Popup.gd" type="Script" id=2]
-[ext_resource path="res://Oswald-Medium.ttf" type="DynamicFontData" id=3]
+[ext_resource path="res://scripts/Popup.gd" type="Script" id=2]
+[ext_resource path="res://fonts/Oswald-Medium.ttf" type="DynamicFontData" id=3]
 
 [sub_resource type="DynamicFont" id=1]
 size = 35

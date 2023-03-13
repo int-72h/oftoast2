@@ -1,6 +1,6 @@
 extends Control
 const GDDL = preload("res://gdnative/gddl.gdns")
-const main = preload("res://Main.tscn")
+const main = preload("res://scenes/Main.tscn")
 var default_url = "https://toastware.org/toast/"
 const version = 1
 const CONTINUE = 0
@@ -53,7 +53,7 @@ func _ready():
 			if gd.get_error() == 0:
 				OS.execute(exec_path,[],false)
 				OS.kill(OS.get_process_id())
-	print("Downloading failed...")
+	print("Downloading failed, or we're up to date!")
 	var dl_object = GDDL.new()
 	assert(dl_object != null)
 	print(dl_object)
@@ -62,6 +62,7 @@ func _ready():
 	yield(get_tree().create_timer(3),"timeout")
 	#$ViewportContainer/Viewport/Spatial.stop()
 	$TextureRect.stop()
+	$LoaderUI/TextureRect2.stop()
 	yield(get_tree().create_timer(2),"timeout") # to allow the transition
 	mainn = main.instance() # instance the main scene... this will call _init()
 	add_child(mainn) # add it! this will call _ready()
@@ -72,6 +73,7 @@ func _ready():
 	tween.tween_property($Control,"modulate",Color.white,1.5)
 	#$Control/Icon.visible = false
 	$TextureRect.call("switch")
+	$LoaderUI/TextureRect2.call("switch")
 	yield(get_tree().create_timer(1.5),"timeout")
 	$Control.connect("started",$TextureRect,"_on_main_spin_start") # hook up the toast to the main stuff
 	$Control.connect("all_done",$TextureRect,"_on_main_spin_stop")
