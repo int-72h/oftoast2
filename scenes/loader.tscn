@@ -115,7 +115,7 @@ margin_right = 1408.0
 margin_bottom = 1068.0
 custom_colors/font_color = Color( 0.933333, 0.882353, 0.811765, 1 )
 custom_fonts/font = SubResource( 8 )
-text = "built from git - currently alpha5+"
+text = "built from git - alpha6"
 align = 2
 
 [node name="Label4" type="Label" parent="LoaderUI"]
